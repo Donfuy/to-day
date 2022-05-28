@@ -5,8 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import com.donfuy.android.ui.theme.TodayTypography
 import com.example.compose.*
-import com.example.ui.theme.AppTypography
 
 private val LightThemeColors = lightColorScheme(
 
@@ -35,7 +35,7 @@ private val LightThemeColors = lightColorScheme(
     outline = md_theme_light_outline,
     inverseOnSurface = md_theme_light_inverseOnSurface,
     inverseSurface = md_theme_light_inverseSurface,
-    inversePrimary = md_theme_light_inversePrimary,
+    inversePrimary = md_theme_light_inversePrimary
 )
 private val DarkThemeColors = darkColorScheme(
 
@@ -68,7 +68,7 @@ private val DarkThemeColors = darkColorScheme(
 )
 
 @Composable
-fun ToDayTheme(
+fun TodayTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
@@ -80,7 +80,7 @@ fun ToDayTheme(
 
     MaterialTheme(
         colorScheme = colors,
-        typography = AppTypography,
+        typography = TodayTypography,
         content = content
     )
 }

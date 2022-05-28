@@ -4,21 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.donfuy.android.today.model.TodoItem
+import com.donfuy.android.today.model.TaskItem
 
-@Database(entities = [TodoItem::class], version = 4, exportSchema = false)
-abstract class TodoItemDatabase : RoomDatabase() {
-    abstract fun todoItemDao(): TodoItemDao
+@Database(entities = [TaskItem::class], version = 6, exportSchema = false)
+abstract class TaskItemDatabase : RoomDatabase() {
+    abstract fun taskItemDao(): TaskItemDao
 
     companion object {
         @Volatile
-        private var INSTANCE: TodoItemDatabase? = null
+        private var INSTANCE: TaskItemDatabase? = null
 
-        fun getDatabase(context: Context): TodoItemDatabase {
+        fun getDatabase(context: Context): TaskItemDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    TodoItemDatabase::class.java,
+                    TaskItemDatabase::class.java,
                     "item_database"
                 )
                     .fallbackToDestructiveMigration()

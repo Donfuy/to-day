@@ -16,18 +16,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.settings.SettingsScreen
 
 class MainActivity : ComponentActivity() {
 
+    private val Context.dataStore by preferencesDataStore("settings")
+
     private val taskViewModel by viewModels<TaskViewModel> {
         TaskViewModel.TodoViewModelFactory(
-            (this.applicationContext as BaseApplication).database.taskItemDao()
+            (this.applicationContext as BaseApplication).database.taskItemDao(),
+            UserPreferencesRepository(applicationContext.dataStore)
         )
     }
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +70,11 @@ fun TodayNavHost(
             )
         }
         composable("settings") {
-            SettingsScreen(onClickBack = { navController.navigateUp()})
+            SettingsScreen(
+                onClickBack = { navController.navigateUp() },
+                showCompleted = taskViewModel.showCompleted,
+                updateShowCompleted = taskViewModel::updateShowCompleted
+            )
         }
         composable("bin") {
             BinScreen(

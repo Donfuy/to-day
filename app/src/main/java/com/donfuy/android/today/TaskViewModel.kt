@@ -6,24 +6,64 @@ import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.TaskItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
+import java.util.Calendar
+import java.util.Date
 
 class TaskViewModel(
     private val taskItemDao: TaskItemDao,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompletedFlow
+    val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
+
     val todayItems: Flow<List<TaskItem>> = taskItemDao.getTodayItems()
     val tomorrowItems: Flow<List<TaskItem>> = taskItemDao.getTomorrowItems()
     val binItems: Flow<List<TaskItem>> = taskItemDao.getBinItems()
 
-    val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompletedFlow
+    fun newTask(task: String, tomorrow: Boolean) {
+        val creationDate: Date = Calendar.getInstance().time
+        addItem(
+            TaskItem(
+                task = task,
+                creationDate = creationDate,
+                lastModified = null,
+                deletionDate = null,
+                tomorrow = tomorrow
+            )
+        )
+    }
 
-    val showCompletedLiveData = userPreferencesRepository.showCompletedFlow.asLiveData()
+    fun setCheck(taskItem: TaskItem) {
+        updateItem(taskItem.copy(checked = !taskItem.checked))
+    }
+
+    fun recycleItem(taskItem: TaskItem) {
+        updateItem(
+            taskItem = taskItem.copy(
+                deleted = true,
+                deletionDate = Calendar.getInstance().time
+            )
+        )
+    }
+
+    fun setTomorrow(taskItem: TaskItem) {
+        updateItem(taskItem = taskItem.copy(tomorrow = true))
+    }
 
     fun updateShowCompleted(showCompleted: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.updateShowCompleted(showCompleted)
+        }
+    }
+
+    fun updateCompletedToBottom(completedToBottom: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateCompletedToBottom(completedToBottom)
         }
     }
 
@@ -51,17 +91,6 @@ class TaskViewModel(
         }
     }
 
-    fun setCheck(taskItem: TaskItem) {
-        updateItem(taskItem.copy(checked = !taskItem.checked))
-    }
-
-    fun recycleItem(taskItem: TaskItem) {
-        updateItem(taskItem = taskItem.copy(deleted = true))
-    }
-
-    fun setTomorrow(taskItem: TaskItem) {
-        updateItem(taskItem = taskItem.copy(tomorrow = true))
-    }
 
     class TodoViewModelFactory(
         private val taskItemDao: TaskItemDao,

@@ -2,6 +2,7 @@ package com.donfuy.android.today.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(tableName = "todo_item")
 data class TaskItem(
@@ -11,4 +12,7 @@ data class TaskItem(
     val checked: Boolean = false,
     val deleted: Boolean = false,
     val tomorrow: Boolean = false,
+    val creationDate: Date,
+    val lastModified: Date?,
+    val deletionDate: Date?
 )

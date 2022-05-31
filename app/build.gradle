@@ -5,6 +5,10 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+        }
+    }
     compileSdk 31
 
     defaultConfig {
@@ -75,6 +79,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
 
+    // Accompanist SystemUiController
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.24.9-beta"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

@@ -19,9 +19,12 @@ import kotlinx.coroutines.flow.Flow
 fun SettingsScreen(
     onClickBack: () -> Unit,
     showCompleted: Flow<Boolean>,
-    updateShowCompleted: (Boolean) -> Unit
+    updateShowCompleted: (Boolean) -> Unit,
+    completedToBottom: Flow<Boolean>,
+    updateCompletedToBottom: (Boolean) -> Unit
 ) {
-    val showCompletedState = showCompleted.collectAsState(initial = false)
+    val showCompletedValue = showCompleted.collectAsState(initial = false).value
+    val completedToBottomValue = completedToBottom.collectAsState(initial = true).value
 
     Scaffold(
         topBar = {
@@ -39,7 +42,18 @@ fun SettingsScreen(
         }
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
-            SwitchRow(title = "Show completed tasks", description = "Description", checked = showCompletedState.value, setCheck = updateShowCompleted)
+            SwitchRow(
+                title = "Show completed tasks",
+                description = "Description",
+                checked = showCompletedValue,
+                setCheck = updateShowCompleted
+            )
+            SwitchRow(
+                title = "Move completed tasks to bottom of the list",
+                description = "Description",
+                checked = completedToBottomValue,
+                setCheck = updateCompletedToBottom
+            )
         }
     }
 }
@@ -51,12 +65,16 @@ fun SwitchRow(
     checked: Boolean,
     setCheck: (Boolean) -> Unit
 ) {
-    Row(modifier = Modifier
-        .padding(16.dp)
-        .fillMaxWidth()) {
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
         Text(
             text = title,
-            modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f),
             softWrap = true,
         )
         Switch(checked = checked, onCheckedChange = setCheck)

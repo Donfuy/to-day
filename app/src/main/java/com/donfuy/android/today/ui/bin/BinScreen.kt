@@ -75,7 +75,6 @@ fun BinRow(
     task: String,
     checked: Boolean
 ) {
-    // Inactive checkboxes
     // "+" button to add them back to today
     // Swipe actions: Left to permanently delete, right to move them to today
     SwipeableRow(
@@ -83,7 +82,9 @@ fun BinRow(
         onSwipedLeft = { /*TODO*/ },
         onSwipedRight = { /*TODO*/ },
         swipeLeftContent = { /*TODO*/ },
-        swipeRightContent = { /*TODO*/ }
+        swipeRightContent = { /*TODO*/ },
+        swipeLeftBackground = MaterialTheme.colorScheme.errorContainer,
+        swipeRightBackground = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column {
             Row(

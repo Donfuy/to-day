@@ -5,12 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.ui.todo.TodayScreen
 import androidx.compose.ui.Modifier
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
+import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+//            window?.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
             TodayApp(taskViewModel = taskViewModel)
         }
     }
@@ -60,20 +61,25 @@ fun TodayNavHost(
     ) {
         composable("today") {
             TodayScreen(
-                items = taskViewModel.todayItems,
-                onAddItem = taskViewModel::addItem,
+                todayTasks = taskViewModel.todayItems,
+                tomorrowTasks = taskViewModel.tomorrowItems,
+                onAddItem = { task, tomorrow -> taskViewModel.newTask(task, tomorrow) },
                 onUpdateItem = taskViewModel::updateItem,
                 onDeleteItem = taskViewModel::recycleItem,
                 onClickSettings = { navController.navigate("settings") },
                 onClickBin = { navController.navigate("bin") },
-                setCheck = taskViewModel::setCheck
+                setCheck = taskViewModel::setCheck,
+                showCompleted = taskViewModel.showCompleted,
+                completedToBottom = taskViewModel.completedToBottom
             )
         }
         composable("settings") {
             SettingsScreen(
                 onClickBack = { navController.navigateUp() },
                 showCompleted = taskViewModel.showCompleted,
-                updateShowCompleted = taskViewModel::updateShowCompleted
+                updateShowCompleted = taskViewModel::updateShowCompleted,
+                completedToBottom = taskViewModel.completedToBottom,
+                updateCompletedToBottom = taskViewModel::updateCompletedToBottom
             )
         }
         composable("bin") {

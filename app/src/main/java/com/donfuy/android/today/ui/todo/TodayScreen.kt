@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import com.donfuy.android.today.model.TaskItem
-import com.donfuy.android.today.ui.theme.TodayTheme
 import kotlinx.coroutines.flow.Flow
 
 enum class Keyboard {
@@ -47,21 +46,37 @@ fun keyboardAsState(): State<Keyboard> {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodayScreen(
-    items: Flow<List<TaskItem>>,
-    onAddItem: (TaskItem) -> Unit,
+    todayTasks: Flow<List<TaskItem>>,
+    tomorrowTasks: Flow<List<TaskItem>>,
+    onAddItem: (String, Boolean) -> Unit,
     onDeleteItem: (TaskItem) -> Unit,
     onUpdateItem: (TaskItem) -> Unit,
     onClickSettings: () -> Unit,
     onClickBin: () -> Unit,
-    setCheck: (TaskItem) -> Unit
+    setCheck: (TaskItem) -> Unit,
+    showCompleted: Flow<Boolean>,
+    completedToBottom: Flow<Boolean>
 ) {
 
-    val todoItems = items.collectAsState(initial = listOf())
+    var todoItems = todayTasks.collectAsState(initial = listOf()).value
+    val tomorrowItems = tomorrowTasks.collectAsState(initial = listOf()).value
+
+    if (!showCompleted.collectAsState(initial = false).value) {
+        todoItems = todoItems.filter { !it.checked }
+    }
+    if (completedToBottom.collectAsState(initial = true).value) {
+        todoItems = todoItems.sortedBy { it.checked }
+    }
 
     // Id of task being edited - -1 if no task is being edited
     val (currentEditItemId, setCurrentEditItemId) = remember { mutableStateOf(-1) }
 
     val isKeyboardOpen by keyboardAsState()
+
+    var tabState by remember { mutableStateOf(0) }
+    val tabTitles = listOf("Today", "Tomorrow")
+    val tabVisible = remember { mutableStateOf(false) }
+    tabVisible.value = tomorrowItems.isNotEmpty()
 
     Scaffold(topBar = {
         TodayTopBar(
@@ -80,20 +95,37 @@ fun TodayScreen(
             }
         }
     }, bottomBar = {
-        AnimatedVisibility(visible = true) {
-            TodayBottomBar(onSubmit = { task -> onAddItem(TaskItem(task = task)) })
-        }
+        TodayBottomBar(
+            onSubmit = { task ->
+                onAddItem(task, tabState == 1)
+            }
+        )
+//        BottomBarFlex(false)
     }) { contentPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
+            AnimatedVisibility(visible = tabVisible.value) {
+                TabRow(selectedTabIndex = tabState) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = tabState == index,
+                            onClick = { tabState = index })
+                    }
+                }
+            }
             Box(
                 modifier = Modifier.weight(1f)
             ) {
                 TodayList(
-                    items = todoItems.value,
+                    items = if ((tabState == 0) || !tabVisible.value) {
+                        todoItems
+                    } else {
+                        tomorrowItems
+                    },
                     onItemClicked = {
                         setCurrentEditItemId(it.id.toInt())
                     },
@@ -110,26 +142,3 @@ fun TodayScreen(
         }
     }
 }
-
-@Composable
-fun TodoScreenPreview() {
-    TodayTheme {
-
-    }
-}
-
-//@Preview
-//@Composable
-//fun TodoScreenPreview() {
-//    ToDayTheme {
-//        val items = listOf<TodoItem>(
-//            TodoItem(2, "a", complete = false, position = 0),
-//            TodoItem(3, "b", complete = false, position = 1))
-//        val itemsFlow: Flow<List<TodoItem>> = flow {
-//            while (true) {
-//                emit(items)
-//            }
-//        }
-//        TodoScreen(items = itemsFlow, {}, {})
-//    }
-//}

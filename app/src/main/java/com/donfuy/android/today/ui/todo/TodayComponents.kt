@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AutoDelete
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -31,7 +32,7 @@ import com.donfuy.android.today.model.TaskItem
 import com.donfuy.android.today.ui.SwipeableRow
 import com.donfuy.android.today.ui.theme.TodayTheme
 
-// TodoTopBar
+
 @Composable
 fun TodayTopBar(
     onClickSettings: () -> Unit,
@@ -62,7 +63,7 @@ fun TodayTopBar(
 
 }
 
-// TodoList
+
 @Composable
 fun TodayList(
     items: List<TaskItem>,
@@ -88,6 +89,7 @@ fun TodayList(
                         todo = task,
                         setCheck = setCheck,
                         onSwipedLeft = { onDeleteItem(task) },
+                        onSwipedRight = { onUpdateItem(task.copy(tomorrow = true)) },
                         onItemClicked = onItemClicked
                     )
                 }
@@ -103,12 +105,13 @@ fun TodayRow(
     todo: TaskItem,
     setCheck: (TaskItem) -> Unit,
     onSwipedLeft: () -> Unit,
+    onSwipedRight: () -> Unit,
     onItemClicked: (TaskItem) -> Unit
 ) {
     SwipeableRow(
         onItemClicked = { onItemClicked(todo) },
         onSwipedLeft = onSwipedLeft,
-        onSwipedRight = { /*TODO*/ },
+        onSwipedRight = onSwipedRight,
         swipeLeftContent = {
             Row(
                 modifier = Modifier
@@ -132,7 +135,31 @@ fun TodayRow(
                 )
             }
         },
-        swipeRightContent = { /*TODO*/ }
+        swipeRightContent = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .defaultMinSize(minHeight = 24.dp)
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    Icons.Outlined.DateRange,
+                    "Move task to tomorrow",
+                    tint = MaterialTheme.colorScheme.inversePrimary,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = "Tomorrow",
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+        },
+        swipeLeftBackground = MaterialTheme.colorScheme.errorContainer,
+        swipeRightBackground = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column {
             Row(

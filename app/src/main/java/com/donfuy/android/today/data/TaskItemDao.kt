@@ -10,10 +10,16 @@ interface TaskItemDao {
     @Query("SELECT * FROM todo_item WHERE deleted = 0 AND tomorrow = 0")
     fun getTodayItems(): Flow<List<TaskItem>>
 
+    @Query("SELECT * FROM todo_item WHERE deleted = 0 AND tomorrow = 0 ORDER BY checked ASC")
+    fun getTodayItemsSortByComplete(): Flow<List<TaskItem>>
+
+    @Query("SELECT * FROM todo_item WHERE deleted = 0 AND tomorrow = 0 AND checked = 0")
+    fun getTodayItemsHideComplete(): Flow<List<TaskItem>>
+
     @Query("SELECT * FROM todo_item WHERE deleted = 1")
     fun getBinItems(): Flow<List<TaskItem>>
 
-    @Query("SELECT * FROM todo_item WHERE tomorrow = 1")
+    @Query("SELECT * FROM todo_item WHERE tomorrow = 1 AND deleted = 0")
     fun getTomorrowItems(): Flow<List<TaskItem>>
 
     @Query("SELECT * FROM todo_item WHERE id = :id")

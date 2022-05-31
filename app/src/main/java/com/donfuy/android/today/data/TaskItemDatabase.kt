@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.donfuy.android.today.model.TaskItem
 
-@Database(entities = [TaskItem::class], version = 6, exportSchema = false)
+@Database(entities = [TaskItem::class], version = 7, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class TaskItemDatabase : RoomDatabase() {
     abstract fun taskItemDao(): TaskItemDao
 

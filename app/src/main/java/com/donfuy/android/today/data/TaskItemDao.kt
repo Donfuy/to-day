@@ -31,6 +31,9 @@ interface TaskItemDao {
     @Query("DELETE FROM todo_item WHERE deleted = 1")
     suspend fun deleteBinItems()
 
+    @Query("UPDATE todo_item SET deleted = 1 WHERE deleted = 0 AND tomorrow = 0")
+    suspend fun binTodayItems()
+
     @Insert(onConflict = REPLACE)
     suspend fun insert(taskItem: TaskItem)
 

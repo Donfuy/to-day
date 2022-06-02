@@ -12,7 +12,7 @@ data class TaskItem(
     val checked: Boolean = false,
     val deleted: Boolean = false,
     val tomorrow: Boolean = false,
-    val creationDate: Date,
-    val lastModified: Date?,
-    val deletionDate: Date?
+    val createdAt: Date,
+    val lastModifiedAt: Date?,
+    val binnedAt: Date?
 )

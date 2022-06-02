@@ -5,12 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.ui.todo.TodayScreen
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -26,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
     private val taskViewModel by viewModels<TaskViewModel> {
         TaskViewModel.TodoViewModelFactory(
-            (this.applicationContext as BaseApplication).database.taskItemDao(),
+            (this.applicationContext as BaseApplication).repository,
             UserPreferencesRepository(applicationContext.dataStore)
         )
     }
@@ -35,7 +33,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-//            window?.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
             TodayApp(taskViewModel = taskViewModel)
         }
     }
@@ -61,8 +58,8 @@ fun TodayNavHost(
     ) {
         composable("today") {
             TodayScreen(
-                todayTasks = taskViewModel.todayItems,
-                tomorrowTasks = taskViewModel.tomorrowItems,
+                todayTasks = taskViewModel.todayTasks,
+                tomorrowTasks = taskViewModel.tomorrowTasks,
                 onAddItem = { task, tomorrow -> taskViewModel.newTask(task, tomorrow) },
                 onUpdateItem = taskViewModel::updateItem,
                 onDeleteItem = taskViewModel::recycleItem,
@@ -84,7 +81,7 @@ fun TodayNavHost(
         }
         composable("bin") {
             BinScreen(
-                tasks = taskViewModel.binItems,
+                tasks = taskViewModel.binTasks,
                 onClickBack = { navController.navigateUp() },
                 onDeleteItem = taskViewModel::deleteItem,
             )

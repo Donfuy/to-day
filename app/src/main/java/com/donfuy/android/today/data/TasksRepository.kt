@@ -2,6 +2,7 @@ package com.donfuy.android.today.data
 
 import com.donfuy.android.today.model.TaskItem
 import kotlinx.coroutines.flow.Flow
+import java.util.Calendar
 
 class TasksRepository(private val taskItemDao: TaskItemDao) {
 
@@ -25,10 +26,11 @@ class TasksRepository(private val taskItemDao: TaskItemDao) {
 
     suspend fun binTodayTasks() {
         taskItemDao.binTodayItems()
+        taskItemDao.tomorrowToToday()
     }
 
     suspend fun deleteBinTasks() {
-        taskItemDao.deleteBinItems()
+        taskItemDao.deleteBinItems(Calendar.getInstance().time)
     }
 
 }

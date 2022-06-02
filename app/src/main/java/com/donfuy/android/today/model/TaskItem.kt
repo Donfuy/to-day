@@ -14,5 +14,5 @@ data class TaskItem(
     val tomorrow: Boolean = false,
     val createdAt: Date,
     val lastModifiedAt: Date?,
-    val binnedAt: Date?
+    val deleteBy: Date?
 )

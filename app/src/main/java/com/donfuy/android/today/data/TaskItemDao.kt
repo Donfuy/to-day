@@ -4,6 +4,7 @@ import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.donfuy.android.today.model.TaskItem
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface TaskItemDao {
@@ -28,11 +29,14 @@ interface TaskItemDao {
     @Query("SELECT * FROM todo_item WHERE task = :task")
     fun getTodoItem(task: String): Flow<TaskItem>
 
-    @Query("DELETE FROM todo_item WHERE deleted = 1")
-    suspend fun deleteBinItems()
+    @Query("DELETE FROM todo_item WHERE deleted = 1 AND deleteBy < :currentDate")
+    suspend fun deleteBinItems(currentDate: Date)
 
     @Query("UPDATE todo_item SET deleted = 1 WHERE deleted = 0 AND tomorrow = 0")
     suspend fun binTodayItems()
+
+    @Query("UPDATE todo_item SET tomorrow = 0 WHERE tomorrow = 1")
+    suspend fun tomorrowToToday()
 
     @Insert(onConflict = REPLACE)
     suspend fun insert(taskItem: TaskItem)

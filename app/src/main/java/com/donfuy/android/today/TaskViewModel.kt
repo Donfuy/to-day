@@ -1,15 +1,19 @@
 package com.donfuy.android.today
 
+import android.util.Log
 import androidx.lifecycle.*
-import com.donfuy.android.today.data.TaskItemDao
 import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.TaskItem
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
 import java.util.Calendar
 import java.util.Date
+
+private const val TAG = "TaskViewModel"
 
 class TaskViewModel(
     private val tasksRepository: TasksRepository,
@@ -19,18 +23,21 @@ class TaskViewModel(
     val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompletedFlow
     val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
 
+    val daysToKeepTasks = userPreferencesRepository.daysToKeepSync
+
     val todayTasks: Flow<List<TaskItem>> = tasksRepository.todayTasks
     val tomorrowTasks: Flow<List<TaskItem>> = tasksRepository.tomorrowTasks
     val binTasks: Flow<List<TaskItem>> = tasksRepository.binTasks
+
 
     fun newTask(task: String, tomorrow: Boolean) {
         val creationDate: Date = Calendar.getInstance().time
         addItem(
             TaskItem(
                 task = task,
-                creationDate = creationDate,
-                lastModified = null,
-                deletionDate = null,
+                createdAt = creationDate,
+                lastModifiedAt = null,
+                deleteBy = null,
                 tomorrow = tomorrow
             )
         )
@@ -40,11 +47,17 @@ class TaskViewModel(
         updateItem(taskItem.copy(checked = !taskItem.checked))
     }
 
-    fun recycleItem(taskItem: TaskItem) {
+    fun binTask(taskItem: TaskItem) {
+        val calendar = Calendar.getInstance()
+
+        Log.d(TAG, "Days to keep tasks: $daysToKeepTasks")
+
+        calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
+
         updateItem(
             taskItem = taskItem.copy(
                 deleted = true,
-                deletionDate = Calendar.getInstance().time
+                deleteBy = calendar.time // calculate time 3 days from now
             )
         )
     }

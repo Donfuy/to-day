@@ -2,15 +2,14 @@ package com.donfuy.android.today.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.donfuy.android.today.data.TaskItemDatabase
+import com.donfuy.android.today.BaseApplication
 
-class DeleteBinnedItemsWorker(context: Context, parameters: WorkerParameters) :
+class TodayCleanupWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
 
     override suspend fun doWork(): Result {
-        TaskItemDatabase.getDatabase(applicationContext).taskItemDao().deleteBinItems()
+        (this.applicationContext as BaseApplication).repository.binTodayTasks()
         return Result.success()
     }
 }

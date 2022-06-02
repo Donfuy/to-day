@@ -1,15 +1,15 @@
 package com.donfuy.android.today.data
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.COMPLETED_TO_BOTTOM
+import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.DAYS_TO_KEEP_TASKS
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.SHOW_COMPLETED
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.SORT_ORDER
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 enum class SortOrder {
     NONE,
@@ -24,6 +24,23 @@ class UserPreferencesRepository(private val userPreferencesStore: DataStore<Pref
         val SHOW_COMPLETED = booleanPreferencesKey("show_completed")
         val SORT_ORDER = stringPreferencesKey("sort_order")
         val COMPLETED_TO_BOTTOM = booleanPreferencesKey("completed_to_bottom")
+        val DAYS_TO_KEEP_TASKS = intPreferencesKey("days_to_keep_tasks")
+    }
+
+    // UGLY
+    val daysToKeepSync = runBlocking {
+        userPreferencesStore.data.map { it[DAYS_TO_KEEP_TASKS] }
+            .first() ?: 3
+    }
+
+    val daysToKeep: Flow<Int> = userPreferencesStore.data.map { preferences ->
+        preferences[DAYS_TO_KEEP_TASKS] ?: 3
+    }
+
+    suspend fun updateDaysToKeep(daysToKeep: Int) {
+        userPreferencesStore.edit { preferences ->
+            preferences[DAYS_TO_KEEP_TASKS] = daysToKeep
+        }
     }
 
     val showCompletedFlow: Flow<Boolean> = userPreferencesStore.data.map { preferences ->

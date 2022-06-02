@@ -17,6 +17,8 @@ import androidx.navigation.compose.rememberNavController
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.settings.SettingsScreen
+import com.donfuy.android.today.workers.scheduleBinCleanup
+import com.donfuy.android.today.workers.scheduleTodayCleanup
 
 class MainActivity : ComponentActivity() {
 
@@ -29,9 +31,12 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        scheduleTodayCleanup(applicationContext)
+        scheduleBinCleanup(applicationContext)
+
         setContent {
             TodayApp(taskViewModel = taskViewModel)
         }
@@ -62,7 +67,7 @@ fun TodayNavHost(
                 tomorrowTasks = taskViewModel.tomorrowTasks,
                 onAddItem = { task, tomorrow -> taskViewModel.newTask(task, tomorrow) },
                 onUpdateItem = taskViewModel::updateItem,
-                onDeleteItem = taskViewModel::recycleItem,
+                onDeleteItem = taskViewModel::binTask,
                 onClickSettings = { navController.navigate("settings") },
                 onClickBin = { navController.navigate("bin") },
                 setCheck = taskViewModel::setCheck,

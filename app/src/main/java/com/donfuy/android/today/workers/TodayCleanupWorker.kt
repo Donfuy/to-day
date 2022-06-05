@@ -10,6 +10,7 @@ class TodayCleanupWorker(context: Context, parameters: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         (this.applicationContext as BaseApplication).repository.binTodayTasks()
+        (this.applicationContext as BaseApplication).repository.moveTomorrowToToday()
         return Result.success()
     }
 }

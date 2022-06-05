@@ -1,36 +1,39 @@
 package com.donfuy.android.today.data
 
-import com.donfuy.android.today.model.TaskItem
+import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
 
-class TasksRepository(private val taskItemDao: TaskItemDao) {
+class TasksRepository(private val taskDao: TaskDao) {
 
-    val todayTasks: Flow<List<TaskItem>> = taskItemDao.getTodayItems()
+    val todayTasks: Flow<List<Task>> = taskDao.getTodayItems()
 
-    val tomorrowTasks: Flow<List<TaskItem>> = taskItemDao.getTomorrowItems()
+    val tomorrowTasks: Flow<List<Task>> = taskDao.getTomorrowItems()
 
-    val binTasks: Flow<List<TaskItem>> = taskItemDao.getBinItems()
+    val binTasks: Flow<List<Task>> = taskDao.getBinItems()
 
-    suspend fun insert(taskItem: TaskItem) {
-        taskItemDao.insert(taskItem)
+    suspend fun insert(task: Task) {
+        taskDao.insert(task)
     }
 
-    suspend fun delete(taskItem: TaskItem) {
-        taskItemDao.delete(taskItem)
+    suspend fun delete(task: Task) {
+        taskDao.delete(task)
     }
 
-    suspend fun update(taskItem: TaskItem) {
-        taskItemDao.update(taskItem)
+    suspend fun update(task: Task) {
+        taskDao.update(task)
     }
 
     suspend fun binTodayTasks() {
-        taskItemDao.binTodayItems()
-        taskItemDao.tomorrowToToday()
+        taskDao.binTodayItems()
+    }
+
+    suspend fun moveTomorrowToToday() {
+        taskDao.tomorrowToToday()
     }
 
     suspend fun deleteBinTasks() {
-        taskItemDao.deleteBinItems(Calendar.getInstance().time)
+        taskDao.deleteBinItems(Calendar.getInstance().time)
     }
 
 }

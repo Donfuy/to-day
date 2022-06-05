@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
-import com.donfuy.android.today.model.TaskItem
+import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
 import java.util.Calendar
 import java.util.Date
@@ -25,15 +23,14 @@ class TaskViewModel(
 
     val daysToKeepTasks = userPreferencesRepository.daysToKeepSync
 
-    val todayTasks: Flow<List<TaskItem>> = tasksRepository.todayTasks
-    val tomorrowTasks: Flow<List<TaskItem>> = tasksRepository.tomorrowTasks
-    val binTasks: Flow<List<TaskItem>> = tasksRepository.binTasks
-
+    val todayTasks: Flow<List<Task>> = tasksRepository.todayTasks
+    val tomorrowTasks: Flow<List<Task>> = tasksRepository.tomorrowTasks
+    val binTasks: Flow<List<Task>> = tasksRepository.binTasks
 
     fun newTask(task: String, tomorrow: Boolean) {
         val creationDate: Date = Calendar.getInstance().time
-        addItem(
-            TaskItem(
+        addTask(
+            Task(
                 task = task,
                 createdAt = creationDate,
                 lastModifiedAt = null,
@@ -43,27 +40,34 @@ class TaskViewModel(
         )
     }
 
-    fun setCheck(taskItem: TaskItem) {
-        updateItem(taskItem.copy(checked = !taskItem.checked))
+    fun setCheck(task: Task, checked: Boolean) {
+        updateTask(task.copy(checked = checked))
     }
 
-    fun binTask(taskItem: TaskItem) {
+    fun binTask(task: Task) {
         val calendar = Calendar.getInstance()
-
         Log.d(TAG, "Days to keep tasks: $daysToKeepTasks")
-
+        // Calculate time 3 days from now
         calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
 
-        updateItem(
-            taskItem = taskItem.copy(
-                deleted = true,
-                deleteBy = calendar.time // calculate time 3 days from now
+        updateTask(
+            task = task.copy(
+                binned = true,
+                deleteBy = calendar.time
             )
         )
     }
 
-    fun setTomorrow(taskItem: TaskItem) {
-        updateItem(taskItem = taskItem.copy(tomorrow = true))
+    fun restoreTask(task: Task) {
+        updateTask(task = task.copy(binned = false))
+    }
+
+    fun setTomorrow(task: Task) {
+        updateTask(task = task.copy(tomorrow = true))
+    }
+
+    fun setToday(task: Task) {
+        updateTask(task = task.copy(tomorrow = false))
     }
 
     fun updateShowCompleted(showCompleted: Boolean) {
@@ -78,25 +82,25 @@ class TaskViewModel(
         }
     }
 
-    fun addItem(taskItem: TaskItem) {
+    fun addTask(task: Task) {
         viewModelScope.launch {
-            tasksRepository.insert(taskItem)
+            tasksRepository.insert(task)
         }
     }
 
-    fun deleteItem(taskItem: TaskItem) {
+    fun deleteTask(task: Task) {
         viewModelScope.launch {
-            tasksRepository.delete(taskItem = taskItem)
+            tasksRepository.delete(task = task)
         }
     }
 
-    fun updateItem(taskItem: TaskItem) {
+    fun updateTask(task: Task) {
         viewModelScope.launch {
-            tasksRepository.update(taskItem = taskItem)
+            tasksRepository.update(task = task)
         }
     }
 
-    class TodoViewModelFactory(
+    class TaskViewModelFactory(
         private val tasksRepository: TasksRepository,
         private val userPreferencesRepository: UserPreferencesRepository
     ) : ViewModelProvider.Factory {

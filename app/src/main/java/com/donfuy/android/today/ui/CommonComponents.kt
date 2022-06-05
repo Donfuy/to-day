@@ -1,5 +1,7 @@
 package com.donfuy.android.today.ui
 
+import android.graphics.Rect
+import android.view.ViewTreeObserver
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -30,11 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,25 +46,109 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.theme.TodayTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-@Preview(widthDp = 412)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreviewBBFlexEdit() {
-    TodayTheme {
-        BottomBarFlex(true)
-    }
-}
+fun TaskRow(
+    task: Task,
+    setCheck: (Boolean) -> Unit = {},
+    onItemClicked: () -> Unit = {},
+    onSwipeLeft: () -> Unit,
+    swipeLeftText: String,
+    swipeLeftTextColor: Color,
+    swipeLeftBackgroundColor: Color,
+    swipeLeftIcon: ImageVector,
+    swipeLeftIconTint: Color,
+    onSwipeRight: () -> Unit,
+    swipeRightText: String,
+    swipeRightTextColor: Color,
+    swipeRightBackgroundColor: Color,
+    swipeRightIcon: ImageVector,
+    swipeRightIconTint: Color,
+    checkBoxEnabled: Boolean = true
+) {
+    SwipeableRow(
+        onItemClicked = onItemClicked,
+        onSwipedLeft = onSwipeLeft,
+        onSwipedRight = onSwipeRight,
+        swipeLeftContent = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .defaultMinSize(minHeight = 24.dp)
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = swipeLeftText,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = swipeLeftTextColor
+                )
+                Icon(
+                    swipeLeftIcon,
+                    null,
+                    tint = swipeLeftIconTint,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        },
+        swipeRightContent = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .defaultMinSize(minHeight = 24.dp)
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    swipeRightIcon,
+                    "Move task to tomorrow",
+                    tint = swipeRightIconTint,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = swipeRightText,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = swipeRightTextColor
+                )
+            }
+        },
+        swipeLeftBackground = swipeLeftBackgroundColor,
+        swipeRightBackground = swipeRightBackgroundColor
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .fillMaxWidth()
 
-@Preview(widthDp = 412)
-@Composable
-fun PreviewBBFlex() {
-    TodayTheme {
-        BottomBarFlex(false)
+            ) {
+                Checkbox(
+                    checked = task.checked,
+                    onCheckedChange = setCheck,
+                    enabled = checkBoxEnabled,
+                    modifier = Modifier
+                        .padding(end = 32.dp)
+                        .size(24.dp, 24.dp)
+                )
+                Text(
+                    task.task,
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    style = MaterialTheme.typography.titleSmall,
+                    softWrap = true
+                )
+            }
+        }
     }
 }
 
@@ -278,4 +366,34 @@ private fun Modifier.swipeable(
         .offset {
             IntOffset(offsetX.value.value.roundToInt(), 0)
         }
+}
+
+enum class Keyboard {
+    Opened, Closed
+}
+
+@Composable
+fun keyboardAsState(): State<Keyboard> {
+    val keyboardState = remember { mutableStateOf(Keyboard.Closed) }
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = Rect()
+            view.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = view.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            keyboardState.value = if (keypadHeight > screenHeight * 0.15) {
+                Keyboard.Opened
+            } else {
+                Keyboard.Closed
+            }
+        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
+
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener)
+        }
+    }
+
+    return keyboardState
 }

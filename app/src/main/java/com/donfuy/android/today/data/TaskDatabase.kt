@@ -5,22 +5,22 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.donfuy.android.today.model.TaskItem
+import com.donfuy.android.today.model.Task
 
-@Database(entities = [TaskItem::class], version = 9, exportSchema = false)
+@Database(entities = [Task::class], version = 11, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class TaskItemDatabase : RoomDatabase() {
-    abstract fun taskItemDao(): TaskItemDao
+abstract class TaskDatabase : RoomDatabase() {
+    abstract fun taskItemDao(): TaskDao
 
     companion object {
         @Volatile
-        private var INSTANCE: TaskItemDatabase? = null
+        private var INSTANCE: TaskDatabase? = null
 
-        fun getDatabase(context: Context): TaskItemDatabase {
+        fun getDatabase(context: Context): TaskDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    TaskItemDatabase::class.java,
+                    TaskDatabase::class.java,
                     "item_database"
                 )
                     .fallbackToDestructiveMigration()

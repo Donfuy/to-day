@@ -26,17 +26,16 @@ private fun getInitialDelay(hour: Int, minute: Int): Long {
     return calendar.timeInMillis - now
 }
 
-// TODO: Change ExistingPeriodicWorkPolicy to KEEP
 fun scheduleTodayCleanup(context: Context) {
     val binTodayTasks =
         PeriodicWorkRequestBuilder<TodayCleanupWorker>(1, TimeUnit.DAYS)
-            .setInitialDelay(getInitialDelay(19, 0), TimeUnit.MILLISECONDS)
+            .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
             .build()
 
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
             "binToday",
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.KEEP,
             binTodayTasks
         )
 }
@@ -44,12 +43,12 @@ fun scheduleTodayCleanup(context: Context) {
 fun scheduleBinCleanup(context: Context) {
     val deleteBinnedTasks =
         PeriodicWorkRequestBuilder<BinCleanupWorker>(3, TimeUnit.DAYS)
-            .setInitialDelay(getInitialDelay(19, 0), TimeUnit.MILLISECONDS)
+            .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
             .build()
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
             "binCleanup",
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.KEEP,
             deleteBinnedTasks
         )
 }

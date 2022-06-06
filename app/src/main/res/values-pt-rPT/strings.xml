@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bin_screen_title">Lixo</string>
+    <string name="settings_screen_title">Definições</string>
+    <string name="today_tab_title">Hoje</string>
+    <string name="tomorrow_tab_title">Amanhã</string>
+    <string name="new_task_hint">Nova tarefa</string>
+    <string name="add_task_content_description">Adicionar tarefa</string>
+    <string name="settings_button_content_description">Definições</string>
+    <string name="bin_button_content_description">Lixo</string>
+    <string name="swipe_action_delete">Apagar</string>
+    <string name="swipe_action_restore">Restaurar</string>
+    <string name="swipe_action_delete_forever">Apagar para sempre</string>
+    <string name="swipe_action_today">Hoje</string>
+    <string name="swipe_action_tomorrow">Amanhã</string>
+    <string name="setting_show_completed_tasks_title">Mostrar tarefas concluídas</string>
+    <string name="setting_show_completed_tasks_description">TODO description</string>
+    <string name="setting_move_completed_tasks_to_bottom_title">Mover tarefas concluídas para o fundo da lista</string>
+    <string name="setting_move_completed_tasks_to_bottom_description">TODO description</string>
+    <string name="settings_back_content_description">Voltar às tarefas</string>
+    <string name="bin_back_content_description">Voltar às tarefas</string>
+</resources>

@@ -2,7 +2,6 @@ package com.donfuy.android.today.ui
 
 import android.graphics.Rect
 import android.view.ViewTreeObserver
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.calculateTargetValue
@@ -11,26 +10,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
-import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoDelete
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.AutoDelete
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -39,15 +24,10 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.theme.TodayTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -110,7 +90,7 @@ fun TaskRow(
             ) {
                 Icon(
                     swipeRightIcon,
-                    "Move task to tomorrow",
+                    null,
                     tint = swipeRightIconTint,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
@@ -152,78 +132,7 @@ fun TaskRow(
     }
 }
 
-@Composable
-fun BottomBarFlex(edit: Boolean) {
-    val (text, setText) = remember { mutableStateOf("") }
-    var size by remember { mutableStateOf(IntSize.Zero) }
-    var width = size.width - 300
-    BottomAppBar(
-        icons = {
-            if (edit) {
-                BasicTextField(
-                    value = text,
-                    onValueChange = setText,
-                    decorationBox = { innerTextField ->
-                        if (text.isEmpty()) {
-                            Text(text = "New task", color = MaterialTheme.colorScheme.surfaceTint)
-                        }
-                        innerTextField()
-                    },
-                    textStyle = MaterialTheme.typography.titleSmall,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        if (text != "") {
-//                        onSubmit(text)
-                            setText("")
-                        } else {
-//                        keyboardController?.hide()
-//                        focusManager.clearFocus()
-                        }
-                    }),
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .width(with(LocalDensity.current) { width.toDp() })
-                        .align(Alignment.CenterVertically)
-//                    .focusRequester(focusRequester)
-                )
-            } else {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "More")
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Outlined.AutoDelete, contentDescription = null)
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Outlined.DateRange, contentDescription = null)
-                }
-            }
 
-
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-//                    if (!isFocused && text.isEmpty()) {
-//                        focusRequester.requestFocus()
-//                        setFocused(true)
-//                    } else {
-//                        onSubmit(text)
-//                        setText("")
-//                    }
-                },
-                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
-                containerColor = MaterialTheme.colorScheme.tertiary
-            ) {
-                Icon(Icons.Filled.Add, "Add task")
-            }
-        },
-        modifier = Modifier.onSizeChanged { size = it }
-    )
-}
 
 @Composable
 fun SwipeableRow(
@@ -260,7 +169,6 @@ fun SwipeableRow(
             ) {
                 swipeRightContent()
             }
-
         }
 
         Surface(

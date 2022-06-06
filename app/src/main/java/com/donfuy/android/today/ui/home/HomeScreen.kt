@@ -2,11 +2,15 @@ package com.donfuy.android.today.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
+import com.donfuy.android.today.R
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,23 +41,38 @@ fun HomeScreen(
         todayTasks = todayTasks.sortedBy { it.checked }
     }
 
+    val homeListState = rememberLazyListState()
+
     // Id of task being edited - -1 if no task is being edited
     val (currentEditItemId, setCurrentEditItemId) = remember { mutableStateOf(-1) }
 
     var tabState by remember { mutableStateOf(0) }
-    val tabTitles = listOf("Today", "Tomorrow")
+    val tabTitles = listOf(
+        stringResource(id = R.string.today_tab_title),
+        stringResource(id = R.string.tomorrow_tab_title)
+    )
     val tabVisible = remember { mutableStateOf(false) }
     tabVisible.value = tomorrowTasks.isNotEmpty()
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         HomeTopBar(
             onClickSettings = onClickSettings, onClickBin = onClickBin
         )
     }, bottomBar = {
-        HomeBottomBar(onSubmit = { task ->
+//        HomeBottomBar(onSubmit = { task ->
+//            onAddTask(task, tabState == 1)
+//        })
+        BottomBarFlex(onSubmit = { task ->
             onAddTask(task, tabState == 1)
+            coroutineScope.launch {
+                homeListState.animateScrollToItem(
+                    todayTasks.size - todayTasks.filter { it.checked }.size
+                )
+            }
+
         })
-//        BottomBarFlex(false)
     }) { contentPadding ->
         Column(
             modifier = Modifier
@@ -90,6 +109,7 @@ fun HomeScreen(
                     },
                     onBinTask = onBinTask,
                     currentEditItemId = currentEditItemId,
+                    state = homeListState
                 )
             }
 

@@ -1,6 +1,8 @@
 package com.donfuy.android.today.ui.bin
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -11,13 +13,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.key
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.SwipeableRow
 import com.donfuy.android.today.ui.TaskRow
+import com.donfuy.android.today.R
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,12 +38,12 @@ fun BinScreen(
         topBar = {
             Column {
                 CenterAlignedTopAppBar(
-                    title = { Text("Bin") },
+                    title = { Text(stringResource(id = R.string.bin_screen_title)) },
                     navigationIcon = {
                         IconButton(onClick = onClickBack) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "Back to Today Screen"
+                                contentDescription = stringResource(id = R.string.bin_back_content_description)
                             )
                         }
                     }
@@ -94,13 +95,13 @@ fun BinRow(
     TaskRow(
         task = task,
         onSwipeLeft = onDeleteTask,
-        swipeLeftText = "Delete",
+        swipeLeftText = stringResource(id = R.string.swipe_action_delete_forever),
         swipeLeftTextColor = MaterialTheme.colorScheme.error,
         swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         swipeLeftIcon = Icons.Outlined.Delete,
         swipeLeftIconTint = MaterialTheme.colorScheme.error,
         onSwipeRight = onRestoreTask,
-        swipeRightText = "Restore",
+        swipeRightText = stringResource(id = R.string.swipe_action_restore),
         swipeRightTextColor = MaterialTheme.colorScheme.inversePrimary,
         swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         swipeRightIcon = Icons.Outlined.RestoreFromTrash,

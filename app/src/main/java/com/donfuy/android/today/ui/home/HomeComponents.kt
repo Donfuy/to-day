@@ -2,6 +2,7 @@ package com.donfuy.android.today.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,19 +18,22 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.SwipeableRow
 import com.donfuy.android.today.ui.today.TodayTaskRow
 
 @Composable
@@ -42,8 +46,10 @@ fun HomeLazyList(
     onUpdateTask: (Task) -> Unit,
     onBinTask: (Task) -> Unit,
     currentEditItemId: Int,
+    state: LazyListState
 ) {
-    LazyColumn {
+
+    LazyColumn(state = state) {
         items(items) { task ->
             key(task) {
                 if (task.id.toInt() == currentEditItemId) {
@@ -54,24 +60,20 @@ fun HomeLazyList(
                     )
                 } else {
                     if (task.tomorrow) {
-                        TomorrowTaskRow(
-                            task = task,
+                        TomorrowTaskRow(task = task,
                             setCheck = { setCheck(task, it) },
                             onItemClicked = { onItemClicked(task) },
                             onSwipeLeft = { setToday(task) },
-                            onSwipeRight = { onBinTask(task) }
-                        )
+                            onSwipeRight = { onBinTask(task) })
                     } else {
-                        TodayTaskRow(
-                            task = task,
+                        TodayTaskRow(task = task,
                             setCheck = { setCheck(task, it) },
                             onSwipeLeft = { onBinTask(task) },
                             onSwipeRight = { setTomorrow(task) },
-                            onItemClicked = { onItemClicked(task) }
-                        )
+                            onItemClicked = { onItemClicked(task) })
                     }
                 }
-                Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
+                Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
             }
         }
     }
@@ -79,31 +81,105 @@ fun HomeLazyList(
 
 @Composable
 fun HomeTopBar(
-    onClickSettings: () -> Unit,
-    onClickBin: () -> Unit
+    onClickSettings: () -> Unit, onClickBin: () -> Unit
 ) {
     Column {
-        CenterAlignedTopAppBar(
-            title = {
-                Text("To-day!")
-            },
-            actions = {
-                IconButton(onClick = { onClickSettings() }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Settings,
-                        contentDescription = "Settings"
+        CenterAlignedTopAppBar(title = {
+            Text(stringResource(id = R.string.home_screen_title))
+        }, actions = {
+            IconButton(onClick = { onClickSettings() }) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = stringResource(
+                        id = R.string.settings_button_content_description
                     )
-                }
-            },
-            navigationIcon = {
-                IconButton(onClick = { onClickBin() }) {
-                    Icon(imageVector = Icons.Outlined.AutoDelete, contentDescription = "Bin")
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+                )
+            }
+        }, navigationIcon = {
+            IconButton(onClick = { onClickBin() }) {
+                Icon(
+                    imageVector = Icons.Outlined.AutoDelete,
+                    contentDescription = stringResource(
+                        id = R.string.bin_button_content_description
+                    )
+                )
+            }
+        }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
         )
         Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun BottomBarFlex(
+    onSubmit: (String) -> Unit
+) {
+    val (text, setText) = remember { mutableStateOf("") }
+    val (isFocused, setFocused) = remember { mutableStateOf(false) }
+    val focusRequester = FocusRequester()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    val width = size.width - 300
+    BottomAppBar(
+        icons = {
+            Surface {
+                BasicTextField(
+                    value = text,
+                    onValueChange = setText,
+                    decorationBox = { innerTextField ->
+                        if (text.isEmpty()) {
+                            Text(text = stringResource(id = R.string.new_task_hint), color = MaterialTheme.colorScheme.surfaceTint)
+                        }
+                        innerTextField()
+                    },
+                    textStyle = MaterialTheme.typography.titleSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (text != "") {
+                            onSubmit(text)
+                            setText("")
+                        } else {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
+                    }),
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .width(with(LocalDensity.current) { width.toDp() })
+                        .align(Alignment.CenterVertically)
+                        .focusRequester(focusRequester)
+                )
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    if (!isFocused && text.isEmpty()) {
+                        focusRequester.requestFocus()
+                        setFocused(true)
+                    } else {
+                        onSubmit(text)
+                        setText("")
+                    }
+                },
+                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
+                containerColor = MaterialTheme.colorScheme.tertiary
+            ) {
+                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
+            }
+        },
+        modifier = Modifier.onSizeChanged { size = it }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -118,9 +194,7 @@ fun HomeBottomBar(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        modifier = Modifier
-            .height(80.dp)
+        color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.height(80.dp)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             BasicTextField(
@@ -128,7 +202,10 @@ fun HomeBottomBar(
                 onValueChange = setText,
                 decorationBox = { innerTextField ->
                     if (text.isEmpty()) {
-                        Text(text = "New task", color = MaterialTheme.colorScheme.surfaceTint)
+                        Text(
+                            text = stringResource(id = R.string.new_task_hint),
+                            color = MaterialTheme.colorScheme.surfaceTint
+                        )
                     }
                     innerTextField()
                 },
@@ -166,7 +243,7 @@ fun HomeBottomBar(
                 elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
                 containerColor = MaterialTheme.colorScheme.tertiary
             ) {
-                Icon(Icons.Filled.Add, "Add task")
+                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
             }
         }
     }
@@ -182,8 +259,7 @@ fun TaskEditRow(
     var textFieldValueState by remember {
         mutableStateOf(
             TextFieldValue(
-                text = task.task,
-                selection = TextRange(task.task.length)
+                text = task.task, selection = TextRange(task.task.length)
             )
         )
     }
@@ -218,8 +294,7 @@ fun TaskEditRow(
                         if (textFieldValueState.text != "") {
                             onSubmitEdit(
                                 task.copy(
-                                    task = textFieldValueState.text,
-                                    checked = checked
+                                    task = textFieldValueState.text, checked = checked
                                 )
                             )
                         } else {
@@ -228,7 +303,10 @@ fun TaskEditRow(
                             focusManager.clearFocus()
                         }
                     }),
-                    textStyle = MaterialTheme.typography.titleSmall,
+                    textStyle = MaterialTheme.typography.titleSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .fillMaxWidth()

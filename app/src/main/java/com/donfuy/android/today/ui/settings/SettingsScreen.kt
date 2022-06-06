@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import com.donfuy.android.today.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 
@@ -29,12 +31,12 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onClickBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back to Today screen"
+                            contentDescription = stringResource(id = R.string.settings_back_content_description)
                         )
                     }
                 }
@@ -43,14 +45,14 @@ fun SettingsScreen(
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
             SwitchRow(
-                title = "Show completed tasks",
-                description = "Description",
+                title = stringResource(id = R.string.setting_show_completed_tasks_title),
+                description = stringResource(id = R.string.setting_show_completed_tasks_description),
                 checked = showCompletedValue,
                 setCheck = updateShowCompleted
             )
             SwitchRow(
-                title = "Move completed tasks to bottom of the list",
-                description = "Description",
+                title = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_title),
+                description = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_description),
                 checked = completedToBottomValue,
                 setCheck = updateCompletedToBottom
             )

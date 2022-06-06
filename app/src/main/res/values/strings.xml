@@ -1,3 +1,37 @@
 <resources>
-    <string name="app_name">To-Day</string>
+    <string name="app_name" translatable="false">To-day</string>
+
+    <!-- Screen Titles -->
+    <string name="home_screen_title" translatable="false">To-day</string>
+    <string name="bin_screen_title">Bin</string>
+    <string name="settings_screen_title">Settings</string>
+
+    <!-- Tab titles -->
+    <string name="today_tab_title">Today</string>
+    <string name="tomorrow_tab_title">Tomorrow</string>
+
+
+    <!-- Home Screen -->
+    <string name="new_task_hint">New task</string>
+    <string name="add_task_content_description">Add task</string>
+    <string name="settings_button_content_description">Settings</string>
+    <string name="bin_button_content_description">Bin</string>
+
+    <!-- Swipe actions -->
+    <string name="swipe_action_delete">Delete</string>
+    <string name="swipe_action_restore">Restore</string>
+    <string name="swipe_action_delete_forever">Delete forever</string>
+    <string name="swipe_action_today">Today</string>
+    <string name="swipe_action_tomorrow">Tomorrow</string>
+
+    <!-- Settings -->
+    <string name="setting_show_completed_tasks_title">Show completed tasks</string>
+    <string name="setting_show_completed_tasks_description">TODO description</string>
+    <string name="setting_move_completed_tasks_to_bottom_title">Move completed tasks to bottom of the list</string>
+    <string name="setting_move_completed_tasks_to_bottom_description">TODO description</string>
+    <string name="settings_back_content_description">Back to tasks screen</string>
+
+    <!-- Bin -->
+    <string name="bin_back_content_description">Back to tasks screen</string>
+
 </resources>

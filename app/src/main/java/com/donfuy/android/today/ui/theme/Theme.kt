@@ -1,10 +1,10 @@
 package com.donfuy.android.today.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightThemeColors = lightColorScheme(
@@ -72,22 +72,34 @@ fun TodayTheme(
     content: @Composable () -> Unit
 ) {
     val systemUiController = rememberSystemUiController()
+
+    val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+    val colorScheme = when {
+        dynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
+        dynamicColor && !useDarkTheme -> dynamicLightColorScheme(LocalContext.current)
+        useDarkTheme -> DarkThemeColors
+        else -> LightThemeColors
+    }
+
+    if (!useDarkTheme) {
+        systemUiController.setStatusBarColor(dynamicLightColorScheme(LocalContext.current).surface)
+    } else {
+        systemUiController.setStatusBarColor(dynamicDarkColorScheme(LocalContext.current).surface)
+    }
+
     val colors = if (!useDarkTheme) {
         LightThemeColors
     } else {
         DarkThemeColors
     }
 
-    if (!useDarkTheme) {
-        systemUiController.setStatusBarColor(md_theme_light_surface)
-    } else {
-        systemUiController.setStatusBarColor(md_theme_dark_surface)
-    }
-
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = colorScheme,
         typography = TodayTypography,
         content = content
     )
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.donfuy.android.today.data
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.COMPLETED_TO_BOTTOM
@@ -27,8 +28,6 @@ class UserPreferencesRepository @Inject constructor(private val userPreferencesS
         val COMPLETED_TO_BOTTOM = booleanPreferencesKey("completed_to_bottom")
         val DAYS_TO_KEEP_TASKS = intPreferencesKey("days_to_keep_tasks")
     }
-
-    suspend fun fetchInitialPreferences() = userPreferencesStore.data.first().toPreferences()
 
     // UGLY
     val daysToKeepSync = runBlocking {

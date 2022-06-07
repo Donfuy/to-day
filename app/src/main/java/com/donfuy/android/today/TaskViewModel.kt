@@ -30,6 +30,7 @@ class TaskViewModel @Inject constructor(
     val tomorrowTasks: Flow<List<Task>> = tasksRepository.tomorrowTasks
     val binTasks: Flow<List<Task>> = tasksRepository.binTasks
 
+
     fun newTask(task: String, tomorrow: Boolean) {
         val creationDate: Date = Calendar.getInstance().time
         addTask(

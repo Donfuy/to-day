@@ -8,6 +8,7 @@ import javax.inject.Inject
 class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
 
     val todayTasks: Flow<List<Task>> = taskDao.getTodayItems()
+    val todayTasksHideComplete: Flow<List<Task>> = taskDao.getTodayItemsHideComplete()
 
     val tomorrowTasks: Flow<List<Task>> = taskDao.getTomorrowItems()
 

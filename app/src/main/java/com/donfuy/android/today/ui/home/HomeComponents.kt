@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -32,6 +34,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.today.TodayTaskRow
@@ -113,7 +117,7 @@ fun HomeTopBar(
 fun BottomBarFlex(
     onSubmit: (String) -> Unit
 ) {
-    val (text, setText) = remember { mutableStateOf("") }
+    val (text, setText) = rememberSaveable { mutableStateOf("") }
     val (isFocused, setFocused) = remember { mutableStateOf(false) }
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
@@ -256,11 +260,14 @@ fun HomeBottomBar(
 fun TaskEditRow(
     task: Task, onSubmitEdit: (Task) -> Unit, onEmptySubmit: () -> Unit
 ) {
+    // Workaround for the workaround not being able to be rememberSaveable
+    val (text, setText) = rememberSaveable { mutableStateOf(task.task) }
+
     // Workaround to set the cursor at the end of the BasicTextField
     var textFieldValueState by remember {
         mutableStateOf(
             TextFieldValue(
-                text = task.task, selection = TextRange(task.task.length)
+                text = text, selection = TextRange(task.task.length)
             )
         )
     }
@@ -268,6 +275,25 @@ fun TaskEditRow(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
+
+    // Access lifecycle events to ensure unsubmitted text doesn't get lost.
+    // This should be moved to an extension function at a later date.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                if (textFieldValueState.text != "") {
+                    onSubmitEdit(task.copy(task = textFieldValueState.text, checked = checked))
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Surface {
         Column {
@@ -285,7 +311,10 @@ fun TaskEditRow(
                 )
                 BasicTextField(
                     value = textFieldValueState,
-                    onValueChange = { textFieldValueState = it },
+                    onValueChange = {
+                        textFieldValueState = it
+                        setText(it.text)
+                    },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Text,

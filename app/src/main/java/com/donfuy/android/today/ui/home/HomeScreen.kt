@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
 import com.donfuy.android.today.R
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,27 +24,26 @@ fun HomeScreen(
     setCheck: (Task, Boolean) -> Unit,
     setToday: (Task) -> Unit,
     setTomorrow: (Task) -> Unit,
-    showCompleted: Flow<Boolean>,
-    completedToBottom: Flow<Boolean>,
+    showCompletedFlow: Flow<Boolean>,
+    completedToBottomFlow: Flow<Boolean>,
     onClickSettings: () -> Unit,
     onClickBin: () -> Unit,
 ) {
+    val completedToBottom = completedToBottomFlow.collectAsState(initial = false).value
+    val showCompleted = showCompletedFlow.collectAsState(initial = false).value
 
-    var todayTasks = todayTasksFlow.collectAsState(initial = listOf()).value
+    val todayTasks = todayTasksFlow.collectAsState(initial = listOf()).value
+        .completedToBottom(completedToBottom)
+        .showCompleted(showCompleted)
+
     val tomorrowTasks = tomorrowTasksFlow.collectAsState(initial = listOf()).value
-
-    if (!showCompleted.collectAsState(initial = false).value) {
-        todayTasks = todayTasks.filter { !it.checked }
-    }
-
-    if (completedToBottom.collectAsState(initial = true).value) {
-        todayTasks = todayTasks.sortedBy { it.checked }
-    }
+        .completedToBottom(completedToBottom)
+        .showCompleted(showCompleted)
 
     val homeListState = rememberLazyListState()
 
     // Id of task being edited - -1 if no task is being edited
-    val (currentEditItemId, setCurrentEditItemId) = remember { mutableStateOf(-1) }
+    val (currentEditItemId, setCurrentEditItemId) = rememberSaveable { mutableStateOf(-1) }
 
     var tabState by remember { mutableStateOf(0) }
     val tabTitles = listOf(
@@ -61,9 +60,6 @@ fun HomeScreen(
             onClickSettings = onClickSettings, onClickBin = onClickBin
         )
     }, bottomBar = {
-//        HomeBottomBar(onSubmit = { task ->
-//            onAddTask(task, tabState == 1)
-//        })
         BottomBarFlex(onSubmit = { task ->
             onAddTask(task, tabState == 1)
             coroutineScope.launch {
@@ -114,5 +110,21 @@ fun HomeScreen(
             }
 
         }
+    }
+}
+
+private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {
+    return if (!showCompleted) {
+        this.filter { !it.checked }
+    } else {
+        this
+    }
+}
+
+private fun List<Task>.completedToBottom(completedToBottom: Boolean): List<Task> {
+    return if (completedToBottom) {
+        this.sortedBy { it.checked }
+    } else {
+        this
     }
 }

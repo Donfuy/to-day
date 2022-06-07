@@ -27,6 +27,8 @@ class UserPreferencesRepository(private val userPreferencesStore: DataStore<Pref
         val DAYS_TO_KEEP_TASKS = intPreferencesKey("days_to_keep_tasks")
     }
 
+    suspend fun fetchInitialPreferences() = userPreferencesStore.data.first().toPreferences()
+
     // UGLY
     val daysToKeepSync = runBlocking {
         userPreferencesStore.data.map { it[DAYS_TO_KEEP_TASKS] }

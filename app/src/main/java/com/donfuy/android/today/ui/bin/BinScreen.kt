@@ -73,15 +73,13 @@ fun BinList(
     onRestoreTask: (Task) -> Unit
 ) {
     LazyColumn {
-        items(tasks) { task ->
-            key(task) {
-                BinRow(
-                    task = task,
-                    onDeleteTask = { onDeleteTask(task) },
-                    onRestoreTask = { onRestoreTask(task) }
-                )
-                Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
-            }
+        items(tasks, key = { it.id }) { task ->
+            BinRow(
+                task = task,
+                onDeleteTask = { onDeleteTask(task) },
+                onRestoreTask = { onRestoreTask(task) }
+            )
+            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
     }
 }

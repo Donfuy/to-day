@@ -7,16 +7,20 @@ plugins {
 android {
     signingConfigs {
         release {
+        storeFile file('C:\\Users\\donfu\\OneDrive\\Desktop\\today\\today.jks')
+            storePassword '%C^VMob7*Us34M'
+            keyPassword '%C^VMob7*Us34M'
+            keyAlias 'upload'
         }
     }
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         applicationId "com.donfuy.android.today"
         minSdk 21
-        targetSdk 31
+        targetSdk 32
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,6 +30,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -52,7 +57,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
 
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version"
@@ -67,7 +72,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
     // Material 3
-    implementation "androidx.compose.material3:material3:1.0.0-alpha12"
+    implementation "androidx.compose.material3:material3:1.0.0-alpha13"
     implementation "androidx.compose.material:material-icons-extended:1.1.1"
 
     // Preferences DataStore

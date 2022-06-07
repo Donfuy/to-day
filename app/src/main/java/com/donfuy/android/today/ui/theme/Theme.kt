@@ -5,7 +5,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import com.donfuy.android.ui.theme.TodayTypography
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightThemeColors = lightColorScheme(
@@ -70,7 +69,7 @@ private val DarkThemeColors = darkColorScheme(
 @Composable
 fun TodayTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     val systemUiController = rememberSystemUiController()
     val colors = if (!useDarkTheme) {
@@ -84,7 +83,6 @@ fun TodayTheme(
     } else {
         systemUiController.setStatusBarColor(md_theme_dark_surface)
     }
-
 
     MaterialTheme(
         colorScheme = colors,

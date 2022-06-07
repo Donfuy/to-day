@@ -50,31 +50,29 @@ fun HomeLazyList(
 ) {
 
     LazyColumn(state = state) {
-        items(items) { task ->
-            key(task) {
-                if (task.id.toInt() == currentEditItemId) {
-                    TaskEditRow(
-                        onSubmitEdit = onUpdateTask,
-                        onEmptySubmit = { onBinTask(task) },
-                        task = task,
-                    )
+        items(items, key = { it.id }) { task ->
+            if (task.id.toInt() == currentEditItemId) {
+                TaskEditRow(
+                    onSubmitEdit = onUpdateTask,
+                    onEmptySubmit = { onBinTask(task) },
+                    task = task,
+                )
+            } else {
+                if (task.tomorrow) {
+                    TomorrowTaskRow(task = task,
+                        setCheck = { setCheck(task, it) },
+                        onItemClicked = { onItemClicked(task) },
+                        onSwipeLeft = { setToday(task) },
+                        onSwipeRight = { onBinTask(task) })
                 } else {
-                    if (task.tomorrow) {
-                        TomorrowTaskRow(task = task,
-                            setCheck = { setCheck(task, it) },
-                            onItemClicked = { onItemClicked(task) },
-                            onSwipeLeft = { setToday(task) },
-                            onSwipeRight = { onBinTask(task) })
-                    } else {
-                        TodayTaskRow(task = task,
-                            setCheck = { setCheck(task, it) },
-                            onSwipeLeft = { onBinTask(task) },
-                            onSwipeRight = { setTomorrow(task) },
-                            onItemClicked = { onItemClicked(task) })
-                    }
+                    TodayTaskRow(task = task,
+                        setCheck = { setCheck(task, it) },
+                        onSwipeLeft = { onBinTask(task) },
+                        onSwipeRight = { setTomorrow(task) },
+                        onItemClicked = { onItemClicked(task) })
                 }
-                Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
             }
+            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
     }
 }
@@ -131,7 +129,10 @@ fun BottomBarFlex(
                     onValueChange = setText,
                     decorationBox = { innerTextField ->
                         if (text.isEmpty()) {
-                            Text(text = stringResource(id = R.string.new_task_hint), color = MaterialTheme.colorScheme.surfaceTint)
+                            Text(
+                                text = stringResource(id = R.string.new_task_hint),
+                                color = MaterialTheme.colorScheme.surfaceTint
+                            )
                         }
                         innerTextField()
                     },

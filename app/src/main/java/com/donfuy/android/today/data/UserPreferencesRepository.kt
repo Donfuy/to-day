@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 enum class SortOrder {
     NONE,
@@ -18,7 +19,7 @@ enum class SortOrder {
     BY_CHECKED_AND_CREATION
 }
 
-class UserPreferencesRepository(private val userPreferencesStore: DataStore<Preferences>) {
+class UserPreferencesRepository @Inject constructor(private val userPreferencesStore: DataStore<Preferences>) {
 
     private object PreferencesKeys {
         val SHOW_COMPLETED = booleanPreferencesKey("show_completed")

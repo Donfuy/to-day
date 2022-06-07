@@ -5,15 +5,18 @@ import androidx.lifecycle.*
 import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 private const val TAG = "TaskViewModel"
 
-class TaskViewModel(
+@HiltViewModel
+class TaskViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,17 +20,11 @@ import com.donfuy.android.today.ui.settings.SettingsScreen
 import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.workers.scheduleBinCleanup
 import com.donfuy.android.today.workers.scheduleTodayCleanup
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val Context.dataStore by preferencesDataStore(PREFS_DATA_STORE_NAME)
-
-    private val taskViewModel by viewModels<TaskViewModel> {
-        TaskViewModel.TaskViewModelFactory(
-            (this.applicationContext as BaseApplication).repository,
-            UserPreferencesRepository(applicationContext.dataStore)
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,13 +33,14 @@ class MainActivity : ComponentActivity() {
         scheduleBinCleanup(applicationContext)
 
         setContent {
-            TodayApp(taskViewModel = taskViewModel)
+            TodayApp()
         }
     }
 }
 
 @Composable
-fun TodayApp(taskViewModel: TaskViewModel) {
+fun TodayApp() {
+    val taskViewModel: TaskViewModel = viewModel()
     TodayTheme {
         val navController = rememberNavController()
         Surface {
@@ -102,4 +98,4 @@ const val SETTINGS_ROUTE = "settings"
 const val BIN_ROUTE = "bin"
 const val HOME_ROUTE = "home"
 
-const val PREFS_DATA_STORE_NAME = "settings"
+private const val PREFS_DATA_STORE_NAME = "settings"

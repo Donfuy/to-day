@@ -3,8 +3,9 @@ package com.donfuy.android.today.data
 import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
+import javax.inject.Inject
 
-class TasksRepository(private val taskDao: TaskDao) {
+class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
 
     val todayTasks: Flow<List<Task>> = taskDao.getTodayItems()
 

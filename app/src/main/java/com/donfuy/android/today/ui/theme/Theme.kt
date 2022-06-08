@@ -86,9 +86,17 @@ fun TodayTheme(
     }
 
     if (!useDarkTheme) {
-        systemUiController.setStatusBarColor(dynamicLightColorScheme(LocalContext.current).surface)
+        if (dynamicColor) {
+            systemUiController.setStatusBarColor(dynamicLightColorScheme(LocalContext.current).surface)
+        } else {
+            systemUiController.setStatusBarColor(LightThemeColors.surface)
+        }
     } else {
-        systemUiController.setStatusBarColor(dynamicDarkColorScheme(LocalContext.current).surface)
+        if (dynamicColor) {
+            systemUiController.setStatusBarColor(dynamicDarkColorScheme(LocalContext.current).surface)
+        } else {
+            systemUiController.setStatusBarColor(DarkThemeColors.surface)
+        }
     }
 
     MaterialTheme(

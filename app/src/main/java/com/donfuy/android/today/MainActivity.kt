@@ -2,14 +2,10 @@ package com.donfuy.android.today
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -39,9 +35,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun restartApp() {
+    private fun restartApp() {
         val intent = Intent(applicationContext, MainActivity::class.java)
-        Log.d(TAG, "Attempting to restart")
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
@@ -69,8 +64,6 @@ fun TodayNavHost(
     taskViewModel: TaskViewModel,
     restartApp: () -> Unit
 ) {
-
-    val context = LocalContext.current.applicationContext
     NavHost(
         navController = navController,
         startDestination = HOME_ROUTE
@@ -118,4 +111,5 @@ private const val SETTINGS_ROUTE = "settings"
 private const val BIN_ROUTE = "bin"
 private const val HOME_ROUTE = "home"
 
+@SuppressWarnings
 private const val TAG = "MainActivity"

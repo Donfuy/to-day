@@ -111,7 +111,12 @@ fun SwitchRow(
                 .weight(1f),
             softWrap = true,
         )
-        Switch(checked = checked, onCheckedChange = setCheck)
+        Switch(
+            checked = checked,
+            onCheckedChange = setCheck,
+            modifier = Modifier
+                .padding(start = 16.dp)
+        )
     }
 }
 

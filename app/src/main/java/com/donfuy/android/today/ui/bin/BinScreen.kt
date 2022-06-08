@@ -12,13 +12,12 @@ import androidx.compose.material.icons.outlined.RestoreFromTrash
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.TaskRow
-import com.donfuy.android.today.R
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,16 +93,16 @@ fun BinRow(
         task = task,
         onSwipeLeft = onDeleteTask,
         swipeLeftText = stringResource(id = R.string.swipe_action_delete_forever),
-        swipeLeftTextColor = MaterialTheme.colorScheme.error,
+        swipeLeftTextColor = MaterialTheme.colorScheme.onErrorContainer,
         swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         swipeLeftIcon = Icons.Outlined.Delete,
-        swipeLeftIconTint = MaterialTheme.colorScheme.error,
+        swipeLeftIconTint = MaterialTheme.colorScheme.onErrorContainer,
         onSwipeRight = onRestoreTask,
         swipeRightText = stringResource(id = R.string.swipe_action_restore),
-        swipeRightTextColor = MaterialTheme.colorScheme.inversePrimary,
+        swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
         swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         swipeRightIcon = Icons.Outlined.RestoreFromTrash,
-        swipeRightIconTint = MaterialTheme.colorScheme.inversePrimary,
+        swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer,
         checkBoxEnabled = false
     )
 }

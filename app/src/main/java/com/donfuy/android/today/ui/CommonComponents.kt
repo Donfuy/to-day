@@ -77,6 +77,7 @@ fun TaskRow(
                     tint = swipeLeftIconTint,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
+                        .padding(start = 8.dp)
                 )
             }
         },
@@ -94,6 +95,7 @@ fun TaskRow(
                     tint = swipeRightIconTint,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
+                        .padding(end = 8.dp)
                 )
                 Text(
                     text = swipeRightText,

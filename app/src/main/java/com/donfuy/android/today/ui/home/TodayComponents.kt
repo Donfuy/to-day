@@ -28,9 +28,9 @@ fun TodayTaskRow(
         swipeLeftIconTint = MaterialTheme.colorScheme.error,
         onSwipeRight = onSwipeRight,
         swipeRightText = "Tomorrow",
-        swipeRightTextColor = MaterialTheme.colorScheme.inversePrimary,
+        swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
         swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         swipeRightIcon = Icons.Outlined.DateRange,
-        swipeRightIconTint = MaterialTheme.colorScheme.inversePrimary
+        swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer
     )
 }

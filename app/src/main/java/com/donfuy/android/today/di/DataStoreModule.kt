@@ -15,6 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import javax.inject.Singleton
 
 private const val PREFS_DATA_STORE_NAME = "settings"
 
@@ -23,6 +24,7 @@ private const val PREFS_DATA_STORE_NAME = "settings"
 object DataStoreModule {
 
     @Provides
+    @Singleton
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
             corruptionHandler = ReplaceFileCorruptionHandler(

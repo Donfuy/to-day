@@ -1,10 +1,15 @@
 package com.donfuy.android.today
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -17,6 +22,8 @@ import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.workers.scheduleBinCleanup
 import com.donfuy.android.today.workers.scheduleTodayCleanup
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -28,18 +35,30 @@ class MainActivity : ComponentActivity() {
         scheduleBinCleanup(applicationContext)
 
         setContent {
-            TodayApp()
+            TodayApp { restartApp() }
         }
+    }
+
+    fun restartApp() {
+        val intent = Intent(applicationContext, MainActivity::class.java)
+        Log.d(TAG, "Attempting to restart")
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }
 
 @Composable
-fun TodayApp() {
+fun TodayApp(restartApp: () -> Unit) {
     val taskViewModel: TaskViewModel = viewModel()
-    TodayTheme {
+
+    TodayTheme(useDynamicColorScheme = runBlocking { taskViewModel.useDynamicTheme.first() }) {
         val navController = rememberNavController()
         Surface {
-            TodayNavHost(navController = navController, taskViewModel = taskViewModel)
+            TodayNavHost(
+                navController = navController,
+                taskViewModel = taskViewModel,
+                restartApp = restartApp
+            )
         }
     }
 }
@@ -48,7 +67,10 @@ fun TodayApp() {
 fun TodayNavHost(
     navController: NavHostController,
     taskViewModel: TaskViewModel,
+    restartApp: () -> Unit
 ) {
+
+    val context = LocalContext.current.applicationContext
     NavHost(
         navController = navController,
         startDestination = HOME_ROUTE
@@ -75,7 +97,10 @@ fun TodayNavHost(
                 showCompleted = taskViewModel.showCompleted,
                 updateShowCompleted = taskViewModel::updateShowCompleted,
                 completedToBottom = taskViewModel.completedToBottom,
-                updateCompletedToBottom = taskViewModel::updateCompletedToBottom
+                updateCompletedToBottom = taskViewModel::updateCompletedToBottom,
+                useDynamicTheme = taskViewModel.useDynamicTheme,
+                updateUseDynamicTheme = taskViewModel::updateUseDynamicTheme,
+                restartApp = restartApp
             )
         }
         composable(BIN_ROUTE) {
@@ -89,8 +114,8 @@ fun TodayNavHost(
     }
 }
 
-const val SETTINGS_ROUTE = "settings"
-const val BIN_ROUTE = "bin"
-const val HOME_ROUTE = "home"
+private const val SETTINGS_ROUTE = "settings"
+private const val BIN_ROUTE = "bin"
+private const val HOME_ROUTE = "home"
 
-private const val PREFS_DATA_STORE_NAME = "settings"
+private const val TAG = "MainActivity"

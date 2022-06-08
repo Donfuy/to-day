@@ -33,5 +33,11 @@
 
     <!-- Bin -->
     <string name="bin_back_content_description">Back to tasks screen</string>
+    <string name="setting_use_dynamic_theme_title">Use Dynamic Theme</string>
+    <string name="setting_use_dynamic_theme_description">TODO description</string>
+    <string name="dialog_required_restart_title">Restart required</string>
+    <string name="dialog_required_restart_prompt">To-day needs to be restarted to apply theme changes. Restart now?</string>
+    <string name="dialog_required_restart_confirm">Yes</string>
+    <string name="dialog_required_restart_later">Restart Later</string>
 
 </resources>

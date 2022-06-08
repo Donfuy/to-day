@@ -7,7 +7,9 @@ import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.IllegalArgumentException
 import java.util.Calendar
 import java.util.Date
@@ -21,10 +23,13 @@ class TaskViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompletedFlow
+    val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompleted
     val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
+    val useDynamicTheme: Flow<Boolean> = userPreferencesRepository.useDynamicTheme
 
-    val daysToKeepTasks = userPreferencesRepository.daysToKeepSync
+    private val daysToKeepTasks = runBlocking {
+        userPreferencesRepository.daysToKeep.first()
+    }
 
     val todayTasks: Flow<List<Task>> = tasksRepository.todayTasks
     val tomorrowTasks: Flow<List<Task>> = tasksRepository.tomorrowTasks
@@ -83,6 +88,12 @@ class TaskViewModel @Inject constructor(
     fun updateCompletedToBottom(completedToBottom: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.updateCompletedToBottom(completedToBottom)
+        }
+    }
+
+    fun updateUseDynamicTheme(useDynamicTheme: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateUseDynamicTheme(useDynamicTheme)
         }
     }
 

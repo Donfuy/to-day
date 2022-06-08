@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.Flow
 
 private val LightThemeColors = lightColorScheme(
 
@@ -68,12 +69,14 @@ private val DarkThemeColors = darkColorScheme(
 
 @Composable
 fun TodayTheme(
+    useDynamicColorScheme: Boolean,
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val systemUiController = rememberSystemUiController()
 
-    val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && useDynamicColorScheme
+
 
     val colorScheme = when {
         dynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
@@ -86,12 +89,6 @@ fun TodayTheme(
         systemUiController.setStatusBarColor(dynamicLightColorScheme(LocalContext.current).surface)
     } else {
         systemUiController.setStatusBarColor(dynamicDarkColorScheme(LocalContext.current).surface)
-    }
-
-    val colors = if (!useDarkTheme) {
-        LightThemeColors
-    } else {
-        DarkThemeColors
     }
 
     MaterialTheme(

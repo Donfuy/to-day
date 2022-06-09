@@ -55,16 +55,12 @@ class TaskViewModel @Inject constructor(
 
     fun binTask(task: Task) {
         val calendar = Calendar.getInstance()
-        Log.d(TAG, "Days to keep tasks: $daysToKeepTasks")
         // Calculate time 3 days from now
         calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
+        viewModelScope.launch {
+            tasksRepository.bin(task, calendar.time)
+        }
 
-        updateTask(
-            task = task.copy(
-                binned = true,
-                deleteBy = calendar.time
-            )
-        )
     }
 
     fun restoreTask(task: Task) {

@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.home.HomeScreen
 import com.donfuy.android.today.ui.settings.SettingsScreen
@@ -21,13 +22,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
+const val KEY_KEEP_TASKS_FOR = "KEEP_TASKS_FOR"
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        scheduleTodayCleanup(applicationContext)
+        runBlocking {
+            scheduleTodayCleanup(applicationContext)
+        }
         scheduleBinCleanup(applicationContext)
 
         setContent {

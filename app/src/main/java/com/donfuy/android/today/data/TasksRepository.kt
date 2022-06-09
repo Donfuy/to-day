@@ -3,6 +3,7 @@ package com.donfuy.android.today.data
 import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
@@ -22,12 +23,21 @@ class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
         taskDao.delete(task)
     }
 
+    suspend fun bin(task: Task, deleteBy: Date) {
+        update(
+            task = task.copy(
+                binned = true,
+                deleteBy = deleteBy
+            )
+        )
+    }
+
     suspend fun update(task: Task) {
         taskDao.update(task)
     }
 
-    suspend fun binTodayTasks() {
-        taskDao.binTodayItems()
+    suspend fun binTodayTasks(deleteBy: Date) {
+        taskDao.binTodayItems(deleteBy)
     }
 
     suspend fun moveTomorrowToToday() {

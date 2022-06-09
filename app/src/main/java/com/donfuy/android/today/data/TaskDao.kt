@@ -32,8 +32,8 @@ interface TaskDao {
     @Query("DELETE FROM task WHERE binned = 1 AND deleteBy < :currentDate")
     suspend fun deleteBinItems(currentDate: Date)
 
-    @Query("UPDATE task SET binned = 1 WHERE binned = 0 AND tomorrow = 0")
-    suspend fun binTodayItems()
+    @Query("UPDATE task SET binned = 1 , deleteBy = :deleteBy WHERE binned = 0 AND tomorrow = 0")
+    suspend fun binTodayItems(deleteBy: Date)
 
     @Query("UPDATE task SET tomorrow = 0 WHERE tomorrow = 1")
     suspend fun tomorrowToToday()

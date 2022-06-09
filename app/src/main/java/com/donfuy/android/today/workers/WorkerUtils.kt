@@ -1,9 +1,8 @@
 package com.donfuy.android.today.workers
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
+import com.donfuy.android.today.KEY_KEEP_TASKS_FOR
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -27,8 +26,10 @@ private fun getInitialDelay(hour: Int, minute: Int): Long {
 }
 
 fun scheduleTodayCleanup(context: Context) {
+//    val daysToKeepTasksData: Data = workDataOf(KEY_KEEP_TASKS_FOR to daysToKeepTasks)
     val binTodayTasks =
         PeriodicWorkRequestBuilder<TodayCleanupWorker>(1, TimeUnit.DAYS)
+//            .setInputData(daysToKeepTasksData)
             .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
             .build()
 

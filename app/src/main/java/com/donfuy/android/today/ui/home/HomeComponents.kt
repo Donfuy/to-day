@@ -2,6 +2,7 @@ package com.donfuy.android.today.ui.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -10,8 +11,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -43,6 +43,143 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.today.TodayTaskRow
+import kotlinx.coroutines.flow.Flow
+
+@Composable
+fun TaskList(
+    tasks: List<Task>,
+    onItemClicked: (Task) -> Unit,
+    setCheck: (Task, Boolean) -> Unit,
+    setToday: (Task) -> Unit,
+    setTomorrow: (Task) -> Unit,
+    onUpdateTask: (Task) -> Unit,
+    onBinTask: (Task) -> Unit,
+    currentEditItemId: Int,
+    state: LazyListState,
+    showCompletedFlow: Flow<Boolean>,
+    setShowCompleted: (Boolean) -> Unit,
+    completedToBottomFlow: Flow<Boolean>
+) {
+
+    val showCompleted = showCompletedFlow.collectAsState(initial = false).value
+    val completedToBottom = completedToBottomFlow.collectAsState(initial = true).value
+
+    LazyColumn(state = state) {
+
+        items(tasks.filter { !it.checked }, key = { it.id }) { task ->
+            when {
+                task.id.toInt() == currentEditItemId -> {
+                    TaskEditRow(
+                        onSubmitEdit = onUpdateTask,
+                        onEmptySubmit = { onBinTask(task) },
+                        task = task,
+                    )
+                }
+                !task.tomorrow -> {
+                    TodayTaskRow(
+                        task = task,
+                        setCheck = { setCheck(task, it) },
+                        onSwipeLeft = { onBinTask(task) },
+                        onSwipeRight = { setTomorrow(task) },
+                        onItemClicked = { onItemClicked(task) }
+                    )
+                }
+                else -> {
+                    TomorrowTaskRow(
+                        task = task,
+                        setCheck = { setCheck(task, it) },
+                        onItemClicked = { onItemClicked(task) },
+                        onSwipeLeft = { setToday(task) },
+                        onSwipeRight = { onBinTask(task) }
+                    )
+                }
+            }
+//            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
+        }
+        if (completedToBottom) {
+            item {
+                ShowCompletedButton(
+                    showCompleted = showCompleted,
+                    setShowCompleted = setShowCompleted
+                )
+            }
+            // TODO: AnimatedVisibility
+            if (showCompleted) {
+                items(tasks.filter { it.checked }, key = { it.id }) { task ->
+                    when {
+                        task.id.toInt() == currentEditItemId -> {
+                            TaskEditRow(
+                                onSubmitEdit = onUpdateTask,
+                                onEmptySubmit = { onBinTask(task) },
+                                task = task,
+                            )
+                        }
+                        !task.tomorrow -> {
+                            TodayTaskRow(
+                                task = task,
+                                setCheck = { setCheck(task, it) },
+                                onSwipeLeft = { onBinTask(task) },
+                                onSwipeRight = { setTomorrow(task) },
+                                onItemClicked = { onItemClicked(task) }
+                            )
+                        }
+                        else -> {
+                            TomorrowTaskRow(
+                                task = task,
+                                setCheck = { setCheck(task, it) },
+                                onItemClicked = { onItemClicked(task) },
+                                onSwipeLeft = { setToday(task) },
+                                onSwipeRight = { onBinTask(task) }
+                            )
+                        }
+                    }
+//                    Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
+                }
+            }
+        }
+
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun ShowCompletedButton(
+    showCompleted: Boolean,
+    setShowCompleted: (Boolean) -> Unit,
+) {
+
+    Surface(Modifier.clickable { setShowCompleted(!showCompleted) }) {
+        Column {
+            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Completed",
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                AnimatedContent(targetState = showCompleted) { showCompleted ->
+                    if (showCompleted) {
+                        Icon(
+                            imageVector = Icons.Filled.ExpandLess,
+                            contentDescription = "Hide Completed Tasks",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.ExpandMore,
+                            contentDescription = "Show Completed Tasks"
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
 
 @Composable
 fun HomeLazyList(

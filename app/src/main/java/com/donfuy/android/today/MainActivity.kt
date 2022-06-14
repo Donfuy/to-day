@@ -84,6 +84,7 @@ fun TodayNavHost(
                 setToday = taskViewModel::setToday,
                 setTomorrow = taskViewModel::setTomorrow,
                 showCompletedFlow = taskViewModel.showCompleted,
+                setShowCompleted = taskViewModel::updateShowCompleted,
                 completedToBottomFlow = taskViewModel.completedToBottom,
                 onClickSettings = { navController.navigate(SETTINGS_ROUTE) },
                 onClickBin = { navController.navigate(BIN_ROUTE) },

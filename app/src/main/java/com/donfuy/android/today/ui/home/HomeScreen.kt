@@ -1,7 +1,10 @@
 package com.donfuy.android.today.ui.home
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +28,7 @@ fun HomeScreen(
     setToday: (Task) -> Unit,
     setTomorrow: (Task) -> Unit,
     showCompletedFlow: Flow<Boolean>,
+    setShowCompleted: (Boolean) -> Unit,
     completedToBottomFlow: Flow<Boolean>,
     onClickSettings: () -> Unit,
     onClickBin: () -> Unit,
@@ -62,12 +66,18 @@ fun HomeScreen(
     }, bottomBar = {
         AddTaskBottomBar(onSubmit = { task ->
             onAddTask(task, tabState == 1)
-            coroutineScope.launch {
-                homeListState.animateScrollToItem(
-                    todayTasks.size - todayTasks.filter { it.checked }.size
-                )
-            }
+            val totalCount = todayTasks.size
+            val checkedTasks = todayTasks.filter { it.checked }.size
+            val visibleTasks = homeListState.layoutInfo.visibleItemsInfo.size - 2
 
+            if (totalCount > visibleTasks + checkedTasks) {
+                coroutineScope.launch {
+                    homeListState.animateScrollToItem(
+//                        todayTasks.size - todayTasks.filter { it.checked }.size
+                    totalCount - checkedTasks - visibleTasks
+                    )
+                }
+            }
         })
     }) { contentPadding ->
         Column(
@@ -87,8 +97,8 @@ fun HomeScreen(
             Box(
                 modifier = Modifier.weight(1f)
             ) {
-                HomeLazyList(
-                    items = if ((tabState == 0) || !tabVisible.value) {
+                TaskList(
+                    tasks = if ((tabState == 0) || !tabVisible.value) {
                         todayTasks
                     } else {
                         tomorrowTasks
@@ -105,7 +115,10 @@ fun HomeScreen(
                     },
                     onBinTask = onBinTask,
                     currentEditItemId = currentEditItemId,
-                    state = homeListState
+                    state = homeListState,
+                    showCompletedFlow = showCompletedFlow,
+                    setShowCompleted = setShowCompleted,
+                    completedToBottomFlow = completedToBottomFlow
                 )
             }
 
@@ -128,3 +141,5 @@ private fun List<Task>.completedToBottom(completedToBottom: Boolean): List<Task>
         this
     }
 }
+
+private const val TAG = "HomeScreen"

@@ -1,5 +1,6 @@
 package com.donfuy.android.today.ui.home
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.ui.today.TodayTaskRow
 
 @Composable
@@ -116,9 +119,17 @@ fun HomeTopBar(
     }
 }
 
+@Preview(widthDp = 200)
+@Composable
+fun PreviewAddTaskBottomBar() {
+    TodayTheme(useDynamicColorScheme = false) {
+        AddTaskBottomBar(onSubmit = { })
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun BottomBarFlex(
+fun AddTaskBottomBar(
     onSubmit: (String) -> Unit
 ) {
     val (text, setText) = rememberSaveable { mutableStateOf("") }
@@ -128,10 +139,12 @@ fun BottomBarFlex(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var size by remember { mutableStateOf(IntSize.Zero) }
-    val width = size.width - 300
+
     BottomAppBar(
         icons = {
-            Surface {
+            Surface(modifier = Modifier.width(with(LocalDensity.current) {
+                size.width.toDp() - 88.dp
+            })) {
                 BasicTextField(
                     value = text,
                     onValueChange = setText,
@@ -165,7 +178,6 @@ fun BottomBarFlex(
                     }),
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
-                        .width(with(LocalDensity.current) { width.toDp() })
                         .align(Alignment.CenterVertically)
                         .onFocusChanged { if (it.isFocused) setFocused(true) }
                         .focusRequester(focusRequester)
@@ -208,74 +220,6 @@ fun BottomBarFlex(
         modifier = Modifier.onSizeChanged { size = it }
     )
 }
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun HomeBottomBar(
-    onSubmit: (String) -> Unit
-) {
-    val (text, setText) = remember { mutableStateOf("") }
-    val (isFocused, setFocused) = remember { mutableStateOf(false) }
-    val focusRequester = FocusRequester()
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.height(80.dp)
-    ) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-            BasicTextField(
-                value = text,
-                onValueChange = setText,
-                decorationBox = { innerTextField ->
-                    if (text.isEmpty()) {
-                        Text(
-                            text = stringResource(id = R.string.new_task_hint),
-                            color = MaterialTheme.colorScheme.surfaceTint
-                        )
-                    }
-                    innerTextField()
-                },
-                textStyle = MaterialTheme.typography.titleSmall,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (text != "") {
-                        onSubmit(text)
-                        setText("")
-                    } else {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                    }
-                }),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 12.dp)
-                    .align(Alignment.CenterVertically)
-                    .focusRequester(focusRequester)
-            )
-            FloatingActionButton(
-                onClick = {
-                    if (!isFocused && text.isEmpty()) {
-                        focusRequester.requestFocus()
-                        setFocused(true)
-                    } else {
-                        onSubmit(text)
-                        setText("")
-                    }
-                },
-                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
-                containerColor = MaterialTheme.colorScheme.tertiary
-            ) {
-                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable

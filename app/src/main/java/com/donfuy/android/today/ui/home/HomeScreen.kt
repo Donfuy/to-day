@@ -60,7 +60,7 @@ fun HomeScreen(
             onClickSettings = onClickSettings, onClickBin = onClickBin
         )
     }, bottomBar = {
-        BottomBarFlex(onSubmit = { task ->
+        AddTaskBottomBar(onSubmit = { task ->
             onAddTask(task, tabState == 1)
             coroutineScope.launch {
                 homeListState.animateScrollToItem(

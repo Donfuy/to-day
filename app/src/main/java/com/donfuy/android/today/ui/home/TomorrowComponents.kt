@@ -5,6 +5,8 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.TaskRow
 
@@ -21,13 +23,13 @@ fun TomorrowTaskRow(
         setCheck = setCheck,
         onItemClicked = onItemClicked,
         onSwipeLeft = onSwipeLeft,
-        swipeLeftText = "Today",
+        swipeLeftText = stringResource(id = R.string.swipe_action_today),
         swipeLeftTextColor = MaterialTheme.colorScheme.onPrimary,
         swipeLeftBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
         swipeLeftIcon = Icons.Outlined.DateRange,
         swipeLeftIconTint = MaterialTheme.colorScheme.onPrimary,
         onSwipeRight = onSwipeRight,
-        swipeRightText = "Delete",
+        swipeRightText = stringResource(id = R.string.swipe_action_delete),
         swipeRightTextColor = MaterialTheme.colorScheme.error,
         swipeRightBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         swipeRightIcon = Icons.Outlined.Delete,

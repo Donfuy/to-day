@@ -1,6 +1,5 @@
 package com.donfuy.android.today.ui.home
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -44,7 +42,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.ui.today.TodayTaskRow
 
 @Composable
@@ -93,37 +90,26 @@ fun HomeTopBar(
     onClickSettings: () -> Unit, onClickBin: () -> Unit
 ) {
     Column {
-        CenterAlignedTopAppBar(title = {
-            Text(stringResource(id = R.string.home_screen_title))
-        }, actions = {
-            IconButton(onClick = { onClickSettings() }) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = stringResource(
-                        id = R.string.settings_button_content_description
+        CenterAlignedTopAppBar(
+            title = {
+                Text(stringResource(id = R.string.home_screen_title))
+            }, actions = {
+                IconButton(onClick = { onClickSettings() }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = stringResource(id = R.string.settings_button_content_description)
                     )
-                )
-            }
-        }, navigationIcon = {
-            IconButton(onClick = { onClickBin() }) {
-                Icon(
-                    imageVector = Icons.Outlined.AutoDelete,
-                    contentDescription = stringResource(
-                        id = R.string.bin_button_content_description
+                }
+            }, navigationIcon = {
+                IconButton(onClick = { onClickBin() }) {
+                    Icon(
+                        imageVector = Icons.Outlined.AutoDelete,
+                        contentDescription = stringResource(id = R.string.bin_button_content_description)
                     )
-                )
-            }
-        }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+                }
+            }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
         )
         Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
-    }
-}
-
-@Preview(widthDp = 200)
-@Composable
-fun PreviewAddTaskBottomBar() {
-    TodayTheme(useDynamicColorScheme = false) {
-        AddTaskBottomBar(onSubmit = { })
     }
 }
 
@@ -140,85 +126,82 @@ fun AddTaskBottomBar(
 
     var size by remember { mutableStateOf(IntSize.Zero) }
 
-    BottomAppBar(
-        icons = {
-            Surface(modifier = Modifier.width(with(LocalDensity.current) {
-                size.width.toDp() - 88.dp
-            })) {
-                BasicTextField(
-                    value = text,
-                    onValueChange = setText,
-                    decorationBox = { innerTextField ->
-                        if (text.isEmpty()) {
-                            Text(
-                                text = stringResource(id = R.string.new_task_hint),
-                                color = MaterialTheme.colorScheme.surfaceTint
-                            )
-                        }
-                        innerTextField()
-                    },
-                    textStyle = MaterialTheme.typography.titleSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        if (text != "") {
-                            onSubmit(text)
-                            setText("")
-                        } else {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                            setFocused(false)
-                        }
-                    }),
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .align(Alignment.CenterVertically)
-                        .onFocusChanged { if (it.isFocused) setFocused(true) }
-                        .focusRequester(focusRequester)
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    when {
-                        !isFocused && text.isEmpty() -> {
-                            focusRequester.requestFocus()
-                            setFocused(true)
-                        }
-                        isFocused && text.isEmpty() -> {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                            setFocused(false)
-                        }
-                        else -> {
-                            onSubmit(text)
-                            setText("")
-                        }
+    BottomAppBar(icons = {
+        Surface(modifier = Modifier.width(with(LocalDensity.current) {
+            size.width.toDp() - 88.dp
+        })) {
+            BasicTextField(value = text,
+                onValueChange = setText,
+                decorationBox = { innerTextField ->
+                    if (text.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.new_task_hint),
+                            color = MaterialTheme.colorScheme.surfaceTint
+                        )
                     }
+                    innerTextField()
                 },
-                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
-                containerColor = MaterialTheme.colorScheme.tertiary
-            ) {
-                AnimatedContent(targetState = text.isEmpty()) { targetState ->
-
-                    if ((targetState && !isFocused) || (!targetState && isFocused)) {
-                        Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
+                textStyle = MaterialTheme.typography.titleSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    if (text != "") {
+                        onSubmit(text)
+                        setText("")
                     } else {
-                        Icon(Icons.Filled.Close, "Dismiss keyboard")
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        setFocused(false)
+                    }
+                }),
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .align(Alignment.CenterVertically)
+                    .onFocusChanged { if (it.isFocused) setFocused(true) }
+                    .focusRequester(focusRequester))
+        }
+    }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = {
+                when {
+                    !isFocused && text.isEmpty() -> {
+                        focusRequester.requestFocus()
+                        setFocused(true)
+                    }
+                    isFocused && text.isEmpty() -> {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        setFocused(false)
+                    }
+                    else -> {
+                        onSubmit(text)
+                        setText("")
                     }
                 }
+            },
+            elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
+            containerColor = MaterialTheme.colorScheme.tertiary
+        ) {
+            AnimatedContent(targetState = text.isEmpty()) { targetState ->
 
+                if ((targetState && !isFocused) || (!targetState && isFocused)) {
+                    Icon(
+                        Icons.Filled.Add,
+                        stringResource(id = R.string.add_task_content_description)
+                    )
+                } else {
+                    Icon(Icons.Filled.Close, "Dismiss keyboard")
+                }
             }
-        },
-        modifier = Modifier.onSizeChanged { size = it }
-    )
+
+        }
+    }, modifier = Modifier.onSizeChanged { size = it })
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
@@ -314,4 +297,5 @@ fun TaskEditRow(
     }
 }
 
+@Suppress("unused")
 private const val TAG = "HomeComponents"

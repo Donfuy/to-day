@@ -1,5 +1,7 @@
 package com.donfuy.android.today.ui.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -9,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -19,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -112,7 +116,7 @@ fun HomeTopBar(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun BottomBarFlex(
     onSubmit: (String) -> Unit
@@ -156,12 +160,14 @@ fun BottomBarFlex(
                         } else {
                             keyboardController?.hide()
                             focusManager.clearFocus()
+                            setFocused(false)
                         }
                     }),
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
                         .width(with(LocalDensity.current) { width.toDp() })
                         .align(Alignment.CenterVertically)
+                        .onFocusChanged { if (it.isFocused) setFocused(true) }
                         .focusRequester(focusRequester)
                 )
             }
@@ -169,18 +175,34 @@ fun BottomBarFlex(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (!isFocused && text.isEmpty()) {
-                        focusRequester.requestFocus()
-                        setFocused(true)
-                    } else {
-                        onSubmit(text)
-                        setText("")
+                    when {
+                        !isFocused && text.isEmpty() -> {
+                            focusRequester.requestFocus()
+                            setFocused(true)
+                        }
+                        isFocused && text.isEmpty() -> {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            setFocused(false)
+                        }
+                        else -> {
+                            onSubmit(text)
+                            setText("")
+                        }
                     }
                 },
                 elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
                 containerColor = MaterialTheme.colorScheme.tertiary
             ) {
-                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
+                AnimatedContent(targetState = text.isEmpty()) { targetState ->
+
+                    if ((targetState && !isFocused) || (!targetState && isFocused)) {
+                        Icon(Icons.Filled.Add, stringResource(id = R.string.add_task_content_description))
+                    } else {
+                        Icon(Icons.Filled.Close, "Dismiss keyboard")
+                    }
+                }
+
             }
         },
         modifier = Modifier.onSizeChanged { size = it }
@@ -348,3 +370,4 @@ fun TaskEditRow(
     }
 }
 
+private const val TAG = "HomeComponents"

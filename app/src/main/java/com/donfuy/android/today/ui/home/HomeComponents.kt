@@ -64,8 +64,8 @@ fun TaskList(
     val showCompleted = showCompletedFlow.collectAsState(initial = false).value
     val completedToBottom = completedToBottomFlow.collectAsState(initial = true).value
 
-    LazyColumn(state = state) {
 
+    LazyColumn(state = state) {
         items(tasks.filter { !it.checked }, key = { it.id }) { task ->
             when {
                 task.id.toInt() == currentEditItemId -> {
@@ -104,6 +104,7 @@ fun TaskList(
                 )
             }
             // TODO: AnimatedVisibility
+
             if (showCompleted) {
                 items(tasks.filter { it.checked }, key = { it.id }) { task ->
                     when {
@@ -304,7 +305,7 @@ fun AddTaskBottomBar(
                     .focusRequester(focusRequester))
         }
     }, floatingActionButton = {
-        FloatingActionButton(
+        HomeFAB(
             onClick = {
                 when {
                     !isFocused && text.isEmpty() -> {
@@ -322,11 +323,8 @@ fun AddTaskBottomBar(
                     }
                 }
             },
-            elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
-            containerColor = MaterialTheme.colorScheme.tertiary
         ) {
             AnimatedContent(targetState = text.isEmpty()) { targetState ->
-
                 if ((targetState && !isFocused) || (!targetState && isFocused)) {
                     Icon(
                         Icons.Filled.Add,
@@ -339,6 +337,16 @@ fun AddTaskBottomBar(
 
         }
     }, modifier = Modifier.onSizeChanged { size = it })
+}
+
+@Composable
+fun HomeFAB(onClick: () -> Unit, content: @Composable () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
+        containerColor = MaterialTheme.colorScheme.primary,
+        content = content
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)

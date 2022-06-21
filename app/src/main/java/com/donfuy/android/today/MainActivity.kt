@@ -11,7 +11,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.home.HomeScreen
 import com.donfuy.android.today.ui.settings.SettingsScreen
@@ -21,8 +20,6 @@ import com.donfuy.android.today.workers.scheduleTodayCleanup
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-
-const val KEY_KEEP_TASKS_FOR = "KEEP_TASKS_FOR"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -107,7 +104,8 @@ fun TodayNavHost(
                 tasks = taskViewModel.binTasks,
                 onClickBack = { navController.navigateUp() },
                 onDeleteTask = taskViewModel::deleteTask,
-                onRestoreTask = taskViewModel::restoreTask
+                onRestoreTask = taskViewModel::restoreTask,
+                onDeleteBinned = taskViewModel::deleteAllBinnedTasks
             )
         }
     }
@@ -117,5 +115,5 @@ private const val SETTINGS_ROUTE = "settings"
 private const val BIN_ROUTE = "bin"
 private const val HOME_ROUTE = "home"
 
-@SuppressWarnings
+@Suppress("unused")
 private const val TAG = "MainActivity"

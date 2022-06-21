@@ -3,7 +3,6 @@ package com.donfuy.android.today.workers
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.donfuy.android.today.KEY_KEEP_TASKS_FOR
 import com.donfuy.android.today.TodayApplication
 import com.donfuy.android.today.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.first

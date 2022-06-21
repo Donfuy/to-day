@@ -63,6 +63,12 @@ class TaskViewModel @Inject constructor(
 
     }
 
+    fun deleteAllBinnedTasks() {
+        viewModelScope.launch {
+            tasksRepository.deleteAllBinnedTasks()
+        }
+    }
+
     fun restoreTask(task: Task) {
         updateTask(task = task.copy(
             binned = false,

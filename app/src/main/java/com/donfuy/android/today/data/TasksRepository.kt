@@ -48,4 +48,8 @@ class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
         taskDao.deleteBinItems(Calendar.getInstance().time)
     }
 
+    suspend fun deleteAllBinnedTasks() {
+        taskDao.deleteAllBinnedTasks()
+    }
+
 }

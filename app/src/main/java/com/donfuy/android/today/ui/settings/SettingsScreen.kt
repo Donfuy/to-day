@@ -17,8 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 
-private const val TAG = "SettingsScreen"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -40,7 +38,6 @@ fun SettingsScreen(
     RestartAppAlertDialog(
         openDialog = openDialog,
         confirmOnClick = {
-            Log.d(TAG, "Wtf")
             restartApp()
         },
         dismissOnClick = { openDialog.value = false }
@@ -152,3 +149,6 @@ fun RestartAppAlertDialog(
         )
     }
 }
+
+@Suppress("unused")
+private const val TAG = "SettingsScreen"

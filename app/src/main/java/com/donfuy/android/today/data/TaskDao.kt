@@ -17,7 +17,7 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE binned = 0 AND tomorrow = 0 AND checked = 0")
     fun getTodayItemsHideComplete(): Flow<List<Task>>
 
-    @Query("SELECT * FROM task WHERE binned = 1")
+    @Query("SELECT * FROM task WHERE binned = 1 ORDER BY deleteBy DESC")
     fun getBinItems(): Flow<List<Task>>
 
     @Query("SELECT * FROM task WHERE tomorrow = 1 AND binned = 0")

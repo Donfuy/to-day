@@ -63,7 +63,6 @@ fun TaskList(
     val showCompleted = showCompletedFlow.collectAsState(initial = false).value
     val completedToBottom = completedToBottomFlow.collectAsState(initial = true).value
 
-
     LazyColumn(state = state) {
         items(tasks.filter { !it.checked }, key = { it.id }) { task ->
             when {
@@ -95,7 +94,7 @@ fun TaskList(
             }
 //            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
-        if (completedToBottom) {
+        if (completedToBottom && !tasks.none { it.checked }) {
             item {
                 ShowCompletedButton(
                     showCompleted = showCompleted,

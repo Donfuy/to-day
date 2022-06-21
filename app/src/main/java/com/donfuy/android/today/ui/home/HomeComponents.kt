@@ -87,8 +87,8 @@ fun TaskList(
                         task = task,
                         setCheck = { setCheck(task, it) },
                         onItemClicked = { onItemClicked(task) },
-                        onSwipeLeft = { setToday(task) },
-                        onSwipeRight = { onBinTask(task) }
+                        onSwipeLeft = { onBinTask(task) },
+                        onSwipeRight = { setToday(task) }
                     )
                 }
             }

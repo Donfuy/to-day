@@ -90,19 +90,9 @@ fun HomeScreen(
             enter = scaleIn(),
             exit = scaleOut()
         ) {
-            LargeFloatingActionButton(
-                onClick = {
-                    setTaskEntryVisible(true)
-                },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    stringResource(id = R.string.add_task_content_description),
-                    modifier = Modifier.size(36.dp)
-                )
-            }
+            HomeFAB(onClick = { setTaskEntryVisible(true) })
         }
+
     }) { contentPadding ->
         Column(
             modifier = Modifier
@@ -127,9 +117,7 @@ fun HomeScreen(
                     } else {
                         tomorrowTasks
                     },
-                    onItemClicked = {
-                        setCurrentEditItemId(it.id.toInt())
-                    },
+                    onItemClicked = { setCurrentEditItemId(it.id.toInt()) },
                     setCheck = setCheck,
                     setToday = setToday,
                     setTomorrow = setTomorrow,
@@ -148,6 +136,20 @@ fun HomeScreen(
 
         }
     }
+}
+
+@Composable
+fun HomeFAB(onClick: () -> Unit) {
+        LargeFloatingActionButton(
+            onClick =  onClick,
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                Icons.Filled.Add,
+                stringResource(id = R.string.add_task_content_description),
+                modifier = Modifier.size(36.dp)
+            )
+        }
 }
 
 private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {

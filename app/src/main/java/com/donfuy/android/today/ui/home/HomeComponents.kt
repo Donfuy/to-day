@@ -11,7 +11,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
@@ -22,10 +25,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,7 +36,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -183,47 +182,6 @@ fun ShowCompletedButton(
 }
 
 @Composable
-fun HomeLazyList(
-    items: List<Task>,
-    onItemClicked: (Task) -> Unit,
-    setCheck: (Task, Boolean) -> Unit,
-    setToday: (Task) -> Unit,
-    setTomorrow: (Task) -> Unit,
-    onUpdateTask: (Task) -> Unit,
-    onBinTask: (Task) -> Unit,
-    currentEditItemId: Int,
-    state: LazyListState
-) {
-
-    LazyColumn(state = state) {
-        items(items, key = { it.id }) { task ->
-            if (task.id.toInt() == currentEditItemId) {
-                TaskEditRow(
-                    onSubmitEdit = onUpdateTask,
-                    onEmptySubmit = { onBinTask(task) },
-                    task = task,
-                )
-            } else {
-                if (task.tomorrow) {
-                    TomorrowTaskRow(task = task,
-                        setCheck = { setCheck(task, it) },
-                        onItemClicked = { onItemClicked(task) },
-                        onSwipeLeft = { setToday(task) },
-                        onSwipeRight = { onBinTask(task) })
-                } else {
-                    TodayTaskRow(task = task,
-                        setCheck = { setCheck(task, it) },
-                        onSwipeLeft = { onBinTask(task) },
-                        onSwipeRight = { setTomorrow(task) },
-                        onItemClicked = { onItemClicked(task) })
-                }
-            }
-            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
-        }
-    }
-}
-
-@Composable
 fun HomeTopBar(
     onClickSettings: () -> Unit, onClickBin: () -> Unit
 ) {
@@ -251,24 +209,26 @@ fun HomeTopBar(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AddTaskBottomBar(
-    onSubmit: (String) -> Unit
+fun TaskEntryBottomBar(
+    onSubmit: (String) -> Unit,
+    taskEntryFocusRequester: FocusRequester,
+    onCloseClick: () -> Unit
 ) {
     val (text, setText) = rememberSaveable { mutableStateOf("") }
-    val (isFocused, setFocused) = remember { mutableStateOf(false) }
-    val focusRequester = FocusRequester()
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
-    var size by remember { mutableStateOf(IntSize.Zero) }
-
-    BottomAppBar(icons = {
-        Surface(modifier = Modifier.width(with(LocalDensity.current) {
-            size.width.toDp() - 88.dp
-        })) {
-            BasicTextField(value = text,
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        ) {
+            BasicTextField(
+                value = text,
                 onValueChange = setText,
                 decorationBox = { innerTextField ->
                     if (text.isEmpty()) {
@@ -293,60 +253,41 @@ fun AddTaskBottomBar(
                         onSubmit(text)
                         setText("")
                     } else {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        setFocused(false)
+                        onCloseClick()
                     }
                 }),
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
+                    .weight(1f)
+                    .padding(start = 8.dp, end = 8.dp)
+                    .focusRequester(taskEntryFocusRequester)
                     .align(Alignment.CenterVertically)
-                    .onFocusChanged { if (it.isFocused) setFocused(true) }
-                    .focusRequester(focusRequester))
-        }
-    }, floatingActionButton = {
-        HomeFAB(
-            onClick = {
-                when {
-                    !isFocused && text.isEmpty() -> {
-                        focusRequester.requestFocus()
-                        setFocused(true)
-                    }
-                    isFocused && text.isEmpty() -> {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        setFocused(false)
-                    }
-                    else -> {
+            )
+            SmallFloatingActionButton(
+                onClick = {
+                    if (text.isEmpty()) {
+                        onCloseClick()
+                    } else {
                         onSubmit(text)
                         setText("")
                     }
-                }
-            },
-        ) {
-            AnimatedContent(targetState = text.isEmpty()) { targetState ->
-                if ((targetState && !isFocused) || (!targetState && isFocused)) {
-                    Icon(
-                        Icons.Filled.Add,
-                        stringResource(id = R.string.add_task_content_description)
-                    )
-                } else {
-                    Icon(Icons.Filled.Close, "Dismiss keyboard")
+                },
+                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                AnimatedContent(targetState = text.isEmpty()) { isEmpty ->
+                    if (!isEmpty) {
+                        Icon(
+                            Icons.Filled.Add,
+                            stringResource(id = R.string.add_task_content_description)
+                        )
+                    } else {
+                        Icon(Icons.Filled.Close, "Dismiss keyboard")
+                    }
                 }
             }
-
         }
-    }, modifier = Modifier.onSizeChanged { size = it })
-}
-
-@Composable
-fun HomeFAB(onClick: () -> Unit, content: @Composable () -> Unit) {
-    FloatingActionButton(
-        onClick = onClick,
-        elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
-        containerColor = MaterialTheme.colorScheme.primary,
-        content = content
-    )
+    }
+    taskEntryFocusRequester.requestFocus()
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)

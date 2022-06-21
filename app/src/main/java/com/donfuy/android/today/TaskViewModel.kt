@@ -64,7 +64,7 @@ class TaskViewModel @Inject constructor(
     }
 
     fun restoreTask(task: Task) {
-        updateTask(task = task.copy(binned = false))
+        updateTask(task = task.copy(binned = false, deleteBy = null))
     }
 
     fun setTomorrow(task: Task) {

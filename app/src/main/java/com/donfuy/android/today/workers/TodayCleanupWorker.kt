@@ -20,13 +20,17 @@ class TodayCleanupWorker @Inject constructor(
     override suspend fun doWork(): Result {
         val calendar = Calendar.getInstance()
 
-        val daysToKeepTasks = runBlocking {
-            userPreferencesRepository.daysToKeep.first()
-        }
-        calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
+//        val blockingDaysToKeepTasks = runBlocking {
+//            userPreferencesRepository.daysToKeep.first()
+//        }
 
-        (this.applicationContext as TodayApplication).repository.binTodayTasks(calendar.time)
-        (this.applicationContext as TodayApplication).repository.moveTomorrowToToday()
+        userPreferencesRepository.daysToKeep.collect { daysToKeepTasks ->
+            calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
+
+            (this.applicationContext as TodayApplication).repository.binTodayTasks(calendar.time)
+            (this.applicationContext as TodayApplication).repository.moveTomorrowToToday()
+        }
+
         return Result.success()
     }
 }

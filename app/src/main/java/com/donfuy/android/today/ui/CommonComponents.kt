@@ -126,7 +126,7 @@ fun TaskRow(
                 Text(
                     task.task,
                     modifier = Modifier.align(Alignment.CenterVertically),
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.bodyLarge,
                     softWrap = true
                 )
             }

@@ -238,7 +238,7 @@ fun TaskEntryBottomBar(
                     }
                     innerTextField()
                 },
-                textStyle = MaterialTheme.typography.titleSmall.copy(
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
@@ -367,7 +367,7 @@ fun TaskEditRow(
                             focusManager.clearFocus()
                         }
                     }),
-                    textStyle = MaterialTheme.typography.titleSmall.copy(
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onSurface
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),

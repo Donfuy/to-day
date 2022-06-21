@@ -7,11 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.RestoreFromTrash
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -26,12 +26,24 @@ fun BinScreen(
     tasks: Flow<List<Task>>,
     onClickBack: () -> Unit,
     onDeleteTask: (Task) -> Unit,
-    onRestoreTask: (Task) -> Unit
+    onRestoreTask: (Task) -> Unit,
+    onDeleteBinned: () -> Unit
 ) {
     // TODO: Banner explaining what the bin is and what happens to the tasks in this list
     // TODO: Right action button should delete all tasks in the bin
 
     val taskItems = tasks.collectAsState(initial = listOf())
+
+    val openDialog = remember { mutableStateOf(false) }
+
+    DeleteAllAlertDialog(
+        openDialog = openDialog,
+        confirmOnClick = {
+            onDeleteBinned()
+            openDialog.value = false
+        },
+        dismissOnClick = { openDialog.value = false }
+    )
 
     Scaffold(
         topBar = {
@@ -43,6 +55,14 @@ fun BinScreen(
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = stringResource(id = R.string.bin_back_content_description)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { openDialog.value = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.DeleteSweep,
+                                contentDescription = "Delete all tasks in the bin"
                             )
                         }
                     }
@@ -105,4 +125,39 @@ fun BinRow(
         swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer,
         checkBoxEnabled = false
     )
+}
+
+@Composable
+fun DeleteAllAlertDialog(
+    openDialog: MutableState<Boolean>,
+    confirmOnClick: () -> Unit,
+    dismissOnClick: () -> Unit
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = dismissOnClick,
+            title = {
+                Text("Empty the bin")
+            },
+            text = {
+                Text("Are you sure you want to permanently delete all tasks in the bin? This cannot be undone.")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    openDialog.value = true
+                    confirmOnClick()
+                }) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    openDialog.value = false
+                    dismissOnClick()
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }

@@ -23,16 +23,16 @@ fun TomorrowTaskRow(
         setCheck = setCheck,
         onItemClicked = onItemClicked,
         onSwipeLeft = onSwipeLeft,
-        swipeLeftText = stringResource(id = R.string.swipe_action_today),
-        swipeLeftTextColor = MaterialTheme.colorScheme.onPrimary,
-        swipeLeftBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-        swipeLeftIcon = Icons.Outlined.DateRange,
-        swipeLeftIconTint = MaterialTheme.colorScheme.onPrimary,
+        swipeLeftText = stringResource(id = R.string.swipe_action_delete),
+        swipeLeftTextColor = MaterialTheme.colorScheme.error,
+        swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
+        swipeLeftIcon = Icons.Outlined.Delete,
+        swipeLeftIconTint = MaterialTheme.colorScheme.error,
         onSwipeRight = onSwipeRight,
-        swipeRightText = stringResource(id = R.string.swipe_action_delete),
-        swipeRightTextColor = MaterialTheme.colorScheme.error,
-        swipeRightBackgroundColor = MaterialTheme.colorScheme.errorContainer,
-        swipeRightIcon = Icons.Outlined.Delete,
-        swipeRightIconTint = MaterialTheme.colorScheme.error
+        swipeRightText = stringResource(id = R.string.swipe_action_today),
+        swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        swipeRightIcon = Icons.Outlined.DateRange,
+        swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer
     )
 }

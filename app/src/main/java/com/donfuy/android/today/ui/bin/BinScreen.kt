@@ -62,7 +62,7 @@ fun BinScreen(
                         IconButton(onClick = { openDialog.value = true }) {
                             Icon(
                                 imageVector = Icons.Filled.DeleteSweep,
-                                contentDescription = "Delete all tasks in the bin"
+                                contentDescription = stringResource(R.string.bin_right_action_delete_content_description)
                             )
                         }
                     }
@@ -137,17 +137,17 @@ fun DeleteAllAlertDialog(
         AlertDialog(
             onDismissRequest = dismissOnClick,
             title = {
-                Text("Empty the bin")
+                Text(stringResource(R.string.dialog_delete_all_binned_title))
             },
             text = {
-                Text("Are you sure you want to permanently delete all tasks in the bin? This cannot be undone.")
+                Text(stringResource(R.string.dialog_delete_all_binned_description))
             },
             confirmButton = {
                 TextButton(onClick = {
                     openDialog.value = true
                     confirmOnClick()
                 }) {
-                    Text("Delete")
+                    Text(stringResource(R.string.dialog_delete_all_binned_confirm_deletion))
                 }
             },
             dismissButton = {
@@ -155,7 +155,7 @@ fun DeleteAllAlertDialog(
                     openDialog.value = false
                     dismissOnClick()
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.dialog_delete_all_binned_cancel))
                 }
             }
         )

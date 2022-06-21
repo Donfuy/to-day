@@ -39,5 +39,10 @@
     <string name="dialog_required_restart_prompt">To-day needs to be restarted to apply theme changes. Restart now?</string>
     <string name="dialog_required_restart_confirm">Yes</string>
     <string name="dialog_required_restart_later">Restart Later</string>
+    <string name="bin_right_action_delete_content_description">Delete all tasks in the bin</string>
+    <string name="dialog_delete_all_binned_title">Empty the bin</string>
+    <string name="dialog_delete_all_binned_description">Are you sure you want to permanently delete all tasks in the bin? This cannot be undone.</string>
+    <string name="dialog_delete_all_binned_confirm_deletion">Delete</string>
+    <string name="dialog_delete_all_binned_cancel">Cancel</string>
 
 </resources>

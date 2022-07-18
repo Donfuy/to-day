@@ -270,7 +270,7 @@ fun TaskEntryBottomBar(
                         setText("")
                     }
                 },
-                elevation = BottomAppBarDefaults.floatingActionButtonElevation(),
+                elevation = BottomAppBarDefaults.FloatingActionButtonElevation,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 AnimatedContent(targetState = text.isEmpty()) { isEmpty ->

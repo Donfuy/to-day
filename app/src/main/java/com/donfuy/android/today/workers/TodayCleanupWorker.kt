@@ -1,21 +1,21 @@
 package com.donfuy.android.today.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.donfuy.android.today.TodayApplication
 import com.donfuy.android.today.data.UserPreferencesRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import java.util.*
-import javax.inject.Inject
 
-class TodayCleanupWorker @Inject constructor(
-    context: Context,
-    parameters: WorkerParameters,
+@HiltWorker
+class TodayCleanupWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted parameters: WorkerParameters,
     private val userPreferencesRepository: UserPreferencesRepository
-) :
-    CoroutineWorker(context, parameters) {
+) : CoroutineWorker(context, parameters) {
 
     override suspend fun doWork(): Result {
         val calendar = Calendar.getInstance()

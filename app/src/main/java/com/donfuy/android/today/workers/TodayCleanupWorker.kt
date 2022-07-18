@@ -18,17 +18,17 @@ class TodayCleanupWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, parameters) {
 
     override suspend fun doWork(): Result {
+        // Get calendar instance with current date & time
         val calendar = Calendar.getInstance()
 
-//        val blockingDaysToKeepTasks = runBlocking {
-//            userPreferencesRepository.daysToKeep.first()
-//        }
-
-        userPreferencesRepository.daysToKeep.collect { daysToKeepTasks ->
-            calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
+        // Calculate task bin removal time from the user preferences.
+        userPreferencesRepository.daysToKeep.collect { daysToKeepTasksInBin ->
+            // Add number of days that tasks should remain in the bin before being permanently
+            // deleted.
+            calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasksInBin)
 
             (this.applicationContext as TodayApplication).repository.binTodayTasks(calendar.time)
-            (this.applicationContext as TodayApplication).repository.moveTomorrowToToday()
+            (this.applicationContext as TodayApplication).repository.moveTomorrowTasksToToday()
         }
 
         return Result.success()

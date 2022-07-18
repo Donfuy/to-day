@@ -36,11 +36,17 @@ class TasksRepository @Inject constructor(private val taskDao: TaskDao) {
         taskDao.update(task)
     }
 
+    /**
+     * Moves all today tasks to the bin, while setting their deletion time to the Date provided to
+     * deleteBy.
+     *
+     * @param deleteBy: Date at which the today tasks should be permanently deleted.
+     */
     suspend fun binTodayTasks(deleteBy: Date) {
         taskDao.binTodayItems(deleteBy)
     }
 
-    suspend fun moveTomorrowToToday() {
+    suspend fun moveTomorrowTasksToToday() {
         taskDao.tomorrowToToday()
     }
 

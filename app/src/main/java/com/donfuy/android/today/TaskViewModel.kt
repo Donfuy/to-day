@@ -1,7 +1,7 @@
 package com.donfuy.android.today
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
@@ -10,12 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.lang.IllegalArgumentException
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
-
-private const val TAG = "TaskViewModel"
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -122,16 +118,19 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    class TaskViewModelFactory(
-        private val tasksRepository: TasksRepository,
-        private val userPreferencesRepository: UserPreferencesRepository
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
-                return TaskViewModel(tasksRepository, userPreferencesRepository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+//    class TaskViewModelFactory(
+//        private val tasksRepository: TasksRepository,
+//        private val userPreferencesRepository: UserPreferencesRepository
+//    ) : ViewModelProvider.Factory {
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            @Suppress("UNCHECKED_CAST")
+//            if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
+//                return TaskViewModel(tasksRepository, userPreferencesRepository) as T
+//            }
+//            throw IllegalArgumentException("Unknown ViewModel class")
+//        }
+//    }
 }
+
+@Suppress("unused")
+private const val TAG = "TaskViewModel"

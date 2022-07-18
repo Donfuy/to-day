@@ -25,30 +25,33 @@ private fun getInitialDelay(hour: Int, minute: Int): Long {
 }
 
 fun scheduleTodayCleanup(context: Context) {
-//    val daysToKeepTasksData: Data = workDataOf(KEY_KEEP_TASKS_FOR to daysToKeepTasks)
-    val binTodayTasks =
-        PeriodicWorkRequestBuilder<TodayCleanupWorker>(1, TimeUnit.DAYS)
-//            .setInputData(daysToKeepTasksData)
-            .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
-            .build()
+    val binTodayTasks = todayCleanupRequestBuilder().build()
 
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
             "binToday",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.REPLACE,
             binTodayTasks
         )
 }
 
+fun todayCleanupRequestBuilder(): PeriodicWorkRequest.Builder {
+    return PeriodicWorkRequestBuilder<TodayCleanupWorker>(1, TimeUnit.DAYS)
+        .setInitialDelay(getInitialDelay(17, 30), TimeUnit.MILLISECONDS)
+}
+
 fun scheduleBinCleanup(context: Context) {
-    val deleteBinnedTasks =
-        PeriodicWorkRequestBuilder<BinCleanupWorker>(3, TimeUnit.DAYS)
-            .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
-            .build()
+    val deleteBinnedTasks = binCleanupRequestBuilder().build()
+
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
             "binCleanup",
             ExistingPeriodicWorkPolicy.KEEP,
             deleteBinnedTasks
         )
+}
+
+fun binCleanupRequestBuilder(): PeriodicWorkRequest.Builder {
+    return PeriodicWorkRequestBuilder<BinCleanupWorker>(3, TimeUnit.DAYS)
+        .setInitialDelay(getInitialDelay(3, 0), TimeUnit.MILLISECONDS)
 }

@@ -6,11 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.home.HomeScreen
 import com.donfuy.android.today.ui.settings.SettingsScreen
@@ -20,16 +22,24 @@ import com.donfuy.android.today.workers.scheduleTodayCleanup
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        runBlocking {
-            scheduleTodayCleanup(applicationContext)
+        lifecycleScope.launchWhenCreated {
+            userPreferencesRepository.hourToDeleteTasks.collect { hourToCleanup ->
+                userPreferencesRepository.minToDeleteTasks.collect { minuteToCleanup ->
+                    scheduleTodayCleanup(applicationContext, hourToCleanup, minuteToCleanup)
+                }
+            }
         }
+
         scheduleBinCleanup(applicationContext)
 
         setContent {
@@ -43,6 +53,8 @@ class MainActivity : ComponentActivity() {
         startActivity(intent)
     }
 }
+
+
 
 @Composable
 fun TodayApp(restartApp: () -> Unit) {
@@ -96,6 +108,10 @@ fun TodayNavHost(
                 updateCompletedToBottom = taskViewModel::updateCompletedToBottom,
                 useDynamicTheme = taskViewModel.useDynamicTheme,
                 updateUseDynamicTheme = taskViewModel::updateUseDynamicTheme,
+                hourToDeleteTasks = taskViewModel.hourToDeleteTasks,
+                updateHourToDeleteTasks = taskViewModel::updateHourToDeleteTasks,
+                minToDeleteTasks = taskViewModel.minToDeleteTasks,
+                updateMinToDeleteTasks = taskViewModel::updateMinToDeleteTasks,
                 restartApp = restartApp
             )
         }

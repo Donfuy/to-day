@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private fun getInitialDelay(hour: Int, minute: Int): Long {
     val calendar = Calendar.getInstance()
@@ -24,8 +25,8 @@ private fun getInitialDelay(hour: Int, minute: Int): Long {
     return calendar.timeInMillis - now
 }
 
-fun scheduleTodayCleanup(context: Context) {
-    val binTodayTasks = todayCleanupRequestBuilder().build()
+fun scheduleTodayCleanup(context: Context, hourToCleanup: Int, minuteToCleanup: Int) {
+    val binTodayTasks = todayCleanupRequestBuilder(hourToCleanup, minuteToCleanup).build()
 
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
@@ -35,9 +36,10 @@ fun scheduleTodayCleanup(context: Context) {
         )
 }
 
-fun todayCleanupRequestBuilder(): PeriodicWorkRequest.Builder {
+fun todayCleanupRequestBuilder(hourToCleanup: Int, minuteToCleanup: Int): PeriodicWorkRequest.Builder {
+
     return PeriodicWorkRequestBuilder<TodayCleanupWorker>(1, TimeUnit.DAYS)
-        .setInitialDelay(getInitialDelay(17, 30), TimeUnit.MILLISECONDS)
+        .setInitialDelay(getInitialDelay(hourToCleanup, minuteToCleanup), TimeUnit.MILLISECONDS)
 }
 
 fun scheduleBinCleanup(context: Context) {
@@ -46,7 +48,7 @@ fun scheduleBinCleanup(context: Context) {
     WorkManager.getInstance(context)
         .enqueueUniquePeriodicWork(
             "binCleanup",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.REPLACE,
             deleteBinnedTasks
         )
 }

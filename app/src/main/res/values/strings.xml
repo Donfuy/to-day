@@ -44,5 +44,7 @@
     <string name="dialog_delete_all_binned_description">Are you sure you want to permanently delete all tasks in the bin? This cannot be undone.</string>
     <string name="dialog_delete_all_binned_confirm_deletion">Delete</string>
     <string name="dialog_delete_all_binned_cancel">Cancel</string>
+    <string name="setting_move_to_bin_time_title">Time to bin tasks</string>
+    <string name="setting_move_to_bin_time_description">Tasks will be moved to the bin at this time of day</string>
 
 </resources>

@@ -4,10 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.COMPLETED_TO_BOTTOM
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.DAYS_TO_KEEP_TASKS
+import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.HOUR_TO_DELETE_TASKS
+import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.MIN_TO_DELETE_TASKS
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.SHOW_COMPLETED
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.SORT_ORDER
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.USE_DYNAMIC_THEME
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -26,6 +29,28 @@ class UserPreferencesRepository @Inject constructor(private val userPreferencesS
         val COMPLETED_TO_BOTTOM = booleanPreferencesKey("completed_to_bottom")
         val DAYS_TO_KEEP_TASKS = intPreferencesKey("days_to_keep_tasks")
         val USE_DYNAMIC_THEME = booleanPreferencesKey("use_dynamic_theme")
+        val HOUR_TO_DELETE_TASKS = intPreferencesKey("hour_to_delete_tasks")
+        val MIN_TO_DELETE_TASKS = intPreferencesKey("min_to_delete_tasks")
+    }
+
+    val minToDeleteTasks: Flow<Int> = userPreferencesStore.data.map { prefs ->
+        prefs[MIN_TO_DELETE_TASKS] ?: 0
+    }
+
+    suspend fun updateMinToDeleteTasks(minToDeleteTasks: Int) {
+        userPreferencesStore.edit { prefs ->
+            prefs[MIN_TO_DELETE_TASKS] = minToDeleteTasks
+        }
+    }
+
+    val hourToDeleteTasks: Flow<Int> = userPreferencesStore.data.map { preferences ->
+        preferences[HOUR_TO_DELETE_TASKS] ?: 3
+    }
+
+    suspend fun updateHourToDeleteTasks(hourToDeleteTasks: Int) {
+        userPreferencesStore.edit { prefs ->
+            prefs[HOUR_TO_DELETE_TASKS] = hourToDeleteTasks
+        }
     }
 
     val useDynamicTheme: Flow<Boolean> = userPreferencesStore.data.map { preferences ->

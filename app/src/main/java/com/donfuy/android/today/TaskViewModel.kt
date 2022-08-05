@@ -22,6 +22,8 @@ class TaskViewModel @Inject constructor(
     val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompleted
     val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
     val useDynamicTheme: Flow<Boolean> = userPreferencesRepository.useDynamicTheme
+    val hourToDeleteTasks: Flow<Int> = userPreferencesRepository.hourToDeleteTasks
+    val minToDeleteTasks: Flow<Int> = userPreferencesRepository.minToDeleteTasks
 
     private val daysToKeepTasks = runBlocking {
         userPreferencesRepository.daysToKeep.first()
@@ -100,6 +102,18 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    fun updateHourToDeleteTasks(hourToDeleteTasks: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateHourToDeleteTasks(hourToDeleteTasks)
+        }
+    }
+
+    fun updateMinToDeleteTasks(minToDeleteTasks: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateMinToDeleteTasks(minToDeleteTasks)
+        }
+    }
+
     fun addTask(task: Task) {
         viewModelScope.launch {
             tasksRepository.insert(task)
@@ -117,19 +131,6 @@ class TaskViewModel @Inject constructor(
             tasksRepository.update(task = task)
         }
     }
-
-//    class TaskViewModelFactory(
-//        private val tasksRepository: TasksRepository,
-//        private val userPreferencesRepository: UserPreferencesRepository
-//    ) : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//            @Suppress("UNCHECKED_CAST")
-//            if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
-//                return TaskViewModel(tasksRepository, userPreferencesRepository) as T
-//            }
-//            throw IllegalArgumentException("Unknown ViewModel class")
-//        }
-//    }
 }
 
 @Suppress("unused")

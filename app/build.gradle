@@ -7,12 +7,12 @@ plugins {
 
 android {
     signingConfigs {
-        release {
-        storeFile file('C:\\Users\\donfu\\OneDrive\\Desktop\\today\\today.jks')
-            storePassword '%C^VMob7*Us34M'
-            keyPassword '%C^VMob7*Us34M'
-            keyAlias 'upload'
-        }
+        //release {
+        //storeFile file('C:/Users/donfu/OneDrive/Desktop/today/today.jks')
+        //    storePassword '%C^VMob7*Us34M'
+        //    keyPassword '%C^VMob7*Us34M'
+        //    keyAlias 'upload'
+        //}
     }
     compileSdk 32
 

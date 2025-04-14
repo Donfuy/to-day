@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin)
     alias(libs.plugins.hilt)
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -54,8 +54,8 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.hilt.compiler)
 
     // Compose
     implementation(libs.compose)
@@ -94,10 +94,6 @@ dependencies {
     // Jetpack Room
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
-}
-
-kapt {
-    correctErrorTypes = true
 }

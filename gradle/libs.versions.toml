@@ -20,6 +20,7 @@ work = "2.7.1"
 
 # Plugins
 androidGradlePlugin = "8.9.1"
+kotlinKsp = "1.6.21-1.0.6"
 kotlinPlugin = "1.6.21"
 
 [libraries]
@@ -55,4 +56,5 @@ work-testing = { module = "androidx.work:work-testing", version.ref = "work" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinPlugin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlinKsp"}
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }

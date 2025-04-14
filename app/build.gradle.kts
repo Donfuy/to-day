@@ -49,53 +49,53 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.8.0")
+    implementation(libs.androidx.core.ktx)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.41")
-    implementation("androidx.hilt:hilt-work:1.0.0")
-    kapt("com.google.dagger:hilt-android-compiler:2.41")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.hilt.compiler)
 
     // Compose
-    implementation("androidx.compose.ui:ui:1.2.0-rc01")
-    implementation("androidx.compose.material:material:1.2.0-rc01")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.2.0-rc01")
-    implementation("androidx.activity:activity-compose:1.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.0-rc01")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.2.0-rc01")
+    implementation(libs.compose)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.activity)
+    androidTestImplementation(libs.compose.junit4)
+    debugImplementation(libs.compose.ui.tooling)
 
-    implementation("androidx.navigation:navigation-compose:2.5.0")
+    implementation(libs.compose.navigation)
 
     // Material 3
-    implementation("androidx.compose.material3:material3:1.0.0-alpha14")
-    implementation("androidx.compose.material:material-icons-extended:1.1.1")
+    implementation(libs.material3)
+    implementation(libs.material.icons.extended)
 
     // Preferences DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.datastore.preferences)
 
     // Lifecycle
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.5.0")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.5.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
+    implementation (libs.lifecycle.runtime.ktx)
+    implementation (libs.lifecycle.livedata.ktx)
+    implementation (libs.lifecycle.viewmodel.ktx)
+    implementation (libs.lifecycle.viewmodel.compose)
 
     // WorkManager
-    implementation("androidx.work:work-runtime-ktx:2.7.1")
-    androidTestImplementation("androidx.work:work-testing:2.7.1")
+    implementation(libs.work.runtime.ktx)
+    androidTestImplementation(libs.work.testing)
 
     // Accompanist SystemUiController
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.9-beta")
+    implementation(libs.accompanist.systemuicontroller)
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.junit.ext)
+    androidTestImplementation(libs.espresso.core)
 
     // Jetpack Room
-    implementation("androidx.room:room-runtime:2.4.2")
-    annotationProcessor("androidx.room:room-compiler:2.4.2")
-    kapt("androidx.room:room-compiler:2.4.2")
-    implementation("androidx.room:room-ktx:2.4.2")
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
 }
 
 kapt {

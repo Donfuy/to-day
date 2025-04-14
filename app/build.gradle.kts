@@ -1,8 +1,8 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin)
+    alias(libs.plugins.hilt)
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
 }
 
 android {

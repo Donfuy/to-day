@@ -1,4 +1,6 @@
 [versions]
+
+# Libraries
 accompanistSystemuicontroller = "0.24.9-beta"
 activityCompose = "1.4.0"
 compose = "1.2.0-rc01"
@@ -15,6 +17,10 @@ material3 = "1.0.0-alpha14"
 materialIconsExtended = "1.1.1"
 room = "2.4.2"
 work = "2.7.1"
+
+# Plugins
+androidGradlePlugin = "8.9.1"
+kotlinPlugin = "1.6.21"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -47,3 +53,6 @@ work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 work-testing = { module = "androidx.work:work-testing", version.ref = "work" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinPlugin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }

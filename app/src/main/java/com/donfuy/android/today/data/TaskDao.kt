@@ -1,7 +1,7 @@
 package com.donfuy.android.today.data
 
 import androidx.room.*
-import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.OnConflictStrategy.Companion.REPLACE
 import com.donfuy.android.today.model.Task
 import kotlinx.coroutines.flow.Flow
 import java.util.Date

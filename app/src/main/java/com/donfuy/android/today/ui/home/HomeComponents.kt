@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -149,7 +150,7 @@ fun ShowCompletedButton(
 
     Surface(Modifier.clickable { setShowCompleted(!showCompleted) }) {
         Column {
-            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
+            HorizontalDivider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -180,6 +181,7 @@ fun ShowCompletedButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
     onClickSettings: () -> Unit, onClickBin: () -> Unit
@@ -204,7 +206,7 @@ fun HomeTopBar(
                 }
             }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
         )
-        Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
+        HorizontalDivider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
     }
 }
 
@@ -270,7 +272,7 @@ fun TaskEntryBottomBar(
                         setText("")
                     }
                 },
-                elevation = BottomAppBarDefaults.FloatingActionButtonElevation,
+                elevation = FloatingActionButtonDefaults.elevation(),
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 AnimatedContent(targetState = text.isEmpty()) { isEmpty ->

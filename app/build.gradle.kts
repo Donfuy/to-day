@@ -9,12 +9,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(35)
+    compileSdkVersion(36)
 
     defaultConfig {
         applicationId = "com.donfuy.android.today"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 2
         versionName = "0.2"
 

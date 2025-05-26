@@ -11,5 +11,5 @@ val Shapes = Shapes(
     large = RoundedCornerShape(0.dp)
 )
 
-val Shapes.addcontainer: Shape
+val Shapes.addContainer: Shape
     get() = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)

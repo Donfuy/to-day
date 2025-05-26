@@ -1,7 +1,5 @@
 package com.donfuy.android.today.ui
 
-import android.graphics.Rect
-import android.view.ViewTreeObserver
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.calculateTargetValue
@@ -23,7 +21,6 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -226,7 +223,7 @@ private fun Modifier.swipeable(
                 awaitPointerEventScope {
                     horizontalDrag(pointerId) { change ->
                         // If the change is more vertical than horizontal, do nothing.
-                        // A kind of deadzone. Doesn't look like it's very performant but it'll do
+                        // A kind of dead-zone. Doesn't look like it's very performant but it'll do
                         // for now.
                         if (change.positionChange().y.absoluteValue < change.positionChange().x.absoluteValue) {
                             // Apply the drag change to the Animatable offset
@@ -276,34 +273,4 @@ private fun Modifier.swipeable(
         .offset {
             IntOffset(offsetX.value.value.roundToInt(), 0)
         }
-}
-
-enum class Keyboard {
-    Opened, Closed
-}
-
-@Composable
-fun keyboardAsState(): State<Keyboard> {
-    val keyboardState = remember { mutableStateOf(Keyboard.Closed) }
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
-            val rect = Rect()
-            view.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = view.rootView.height
-            val keypadHeight = screenHeight - rect.bottom
-            keyboardState.value = if (keypadHeight > screenHeight * 0.15) {
-                Keyboard.Opened
-            } else {
-                Keyboard.Closed
-            }
-        }
-        view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
-
-        onDispose {
-            view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener)
-        }
-    }
-
-    return keyboardState
 }

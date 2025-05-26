@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.flow.Flow
 
 private val LightThemeColors = lightColorScheme(
 
@@ -77,7 +76,6 @@ fun TodayTheme(
 
     val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && useDynamicColorScheme
 
-
     val colorScheme = when {
         dynamicColor && useDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
         dynamicColor && !useDarkTheme -> dynamicLightColorScheme(LocalContext.current)
@@ -104,7 +102,4 @@ fun TodayTheme(
         typography = TodayTypography,
         content = content
     )
-
-
-
 }

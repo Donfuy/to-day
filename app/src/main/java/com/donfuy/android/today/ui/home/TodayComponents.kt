@@ -1,4 +1,4 @@
-package com.donfuy.android.today.ui.today
+package com.donfuy.android.today.ui.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange

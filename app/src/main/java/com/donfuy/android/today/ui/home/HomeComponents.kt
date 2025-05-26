@@ -42,7 +42,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.today.TodayTaskRow
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -288,7 +287,7 @@ fun TaskEntryBottomBar(
             }
         }
     }
-    taskEntryFocusRequester.requestFocus()
+    SideEffect { taskEntryFocusRequester.requestFocus() }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)

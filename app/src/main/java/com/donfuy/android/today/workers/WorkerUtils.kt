@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.*
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 private fun getInitialDelay(hour: Int, minute: Int): Long {
     val calendar = Calendar.getInstance()

@@ -10,7 +10,6 @@ import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.S
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.SORT_ORDER
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.USE_DYNAMIC_THEME
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

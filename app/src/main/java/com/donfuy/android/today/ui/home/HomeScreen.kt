@@ -4,14 +4,31 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -52,10 +69,10 @@ fun HomeScreen(
     val homeListState = rememberLazyListState()
 
     // Id of task being edited - -1 if no task is being edited
-    val (currentEditItemId, setCurrentEditItemId) = rememberSaveable { mutableStateOf(-1) }
+    val (currentEditItemId, setCurrentEditItemId) = rememberSaveable { mutableIntStateOf(-1) }
 
     // Tabs
-    var tabState by remember { mutableStateOf(0) }
+    var tabState by remember { mutableIntStateOf(0) }
     val tabTitles = listOf(
         stringResource(id = R.string.today_tab_title),
         stringResource(id = R.string.tomorrow_tab_title)
@@ -68,32 +85,35 @@ fun HomeScreen(
     val (taskEntryVisible, setTaskEntryVisible) = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    Scaffold(topBar = {
-        HomeTopBar(
-            onClickSettings = onClickSettings, onClickBin = onClickBin
-        )
-    }, bottomBar = {
-        if (taskEntryVisible) {
-            TaskEntryBottomBar(
-                onSubmit = { onAddTask(it, tabState == 1) },
-                taskEntryFocusRequester = taskEntryFocusRequester,
-                onCloseClick = {
-                    focusManager.clearFocus()
-                    setTaskEntryVisible(false)
-                }
+    Scaffold(
+        modifier = Modifier.imePadding(),
+        topBar = {
+            HomeTopBar(
+                onClickSettings = onClickSettings, onClickBin = onClickBin
             )
+        },
+        bottomBar = {
+            if (taskEntryVisible) {
+                TaskEntryBottomBar(
+                    onSubmit = { onAddTask(it, tabState == 1) },
+                    taskEntryFocusRequester = taskEntryFocusRequester,
+                    onCloseClick = {
+                        focusManager.clearFocus()
+                        setTaskEntryVisible(false)
+                    }
+                )
+            }
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = !taskEntryVisible,
+                enter = scaleIn(),
+                exit = scaleOut()
+            ) {
+                HomeFAB(onClick = { setTaskEntryVisible(true) })
+            }
         }
-
-    }, floatingActionButton = {
-        AnimatedVisibility(
-            visible = !taskEntryVisible,
-            enter = scaleIn(),
-            exit = scaleOut()
-        ) {
-            HomeFAB(onClick = { setTaskEntryVisible(true) })
-        }
-
-    }) { contentPadding ->
+    ) { contentPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

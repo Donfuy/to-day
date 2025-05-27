@@ -8,7 +8,7 @@ import com.donfuy.android.today.TodayApplication
 import com.donfuy.android.today.data.UserPreferencesRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.util.*
+import java.util.Calendar
 
 @HiltWorker
 class TodayCleanupWorker @AssistedInject constructor(

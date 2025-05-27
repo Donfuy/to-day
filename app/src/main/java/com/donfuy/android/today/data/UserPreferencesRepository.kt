@@ -1,7 +1,11 @@
 package com.donfuy.android.today.data
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.COMPLETED_TO_BOTTOM
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.DAYS_TO_KEEP_TASKS
 import com.donfuy.android.today.data.UserPreferencesRepository.PreferencesKeys.HOUR_TO_DELETE_TASKS

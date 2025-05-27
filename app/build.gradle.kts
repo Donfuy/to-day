@@ -93,9 +93,6 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     androidTestImplementation(libs.work.testing)
 
-    // Accompanist SystemUiController
-    implementation(libs.accompanist.systemuicontroller)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.junit.ext)
     androidTestImplementation(libs.espresso.core)

@@ -31,23 +31,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
+import com.donfuy.android.today.ui.SettingsAction
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onClickBack: () -> Unit,
     showCompleted: Flow<Boolean>,
-    updateShowCompleted: (Boolean) -> Unit,
     completedToBottom: Flow<Boolean>,
-    updateCompletedToBottom: (Boolean) -> Unit,
     useDynamicTheme: Flow<Boolean>,
-    updateUseDynamicTheme: (Boolean) -> Unit,
     hourToDeleteTasks: Flow<Int>,
-    updateHourToDeleteTasks: (Int) -> Unit,
     minToDeleteTasks: Flow<Int>,
-    updateMinToDeleteTasks: (Int) -> Unit,
-    restartApp: () -> Unit
+    onAction: (SettingsAction) -> Unit,
+    onBackClick: () -> Unit,
+    onRestartApp: () -> Unit
 ) {
     val showCompletedValue = showCompleted.collectAsState(initial = false).value
     val completedToBottomValue = completedToBottom.collectAsState(initial = true).value
@@ -59,9 +56,7 @@ fun SettingsScreen(
 
     RestartAppAlertDialog(
         openDialog = openDialog,
-        confirmOnClick = {
-            restartApp()
-        },
+        confirmOnClick = onRestartApp,
         dismissOnClick = { openDialog.value = false }
     )
 
@@ -70,9 +65,9 @@ fun SettingsScreen(
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.settings_screen_title)) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        onClickBack()
-                    }) {
+                    IconButton(
+                        onClick = onBackClick
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.settings_back_content_description)
@@ -87,21 +82,29 @@ fun SettingsScreen(
                 title = stringResource(id = R.string.setting_show_completed_tasks_title),
                 description = stringResource(id = R.string.setting_show_completed_tasks_description),
                 checked = showCompletedValue,
-                setCheck = updateShowCompleted
+                setCheck = {
+                    onAction.invoke(SettingsAction.OnToggleShowCompleted(it))
+                }
             )
             SwitchRow(
                 title = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_title),
                 description = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_description),
                 checked = completedToBottomValue,
-                setCheck = updateCompletedToBottom
+                setCheck = {
+                    onAction.invoke(SettingsAction.OnToggleCompletedToBottom(it))
+                }
             )
             TimePickerRow(
                 title = stringResource(R.string.setting_move_to_bin_time_title),
                 description = stringResource(R.string.setting_move_to_bin_time_description),
                 currentHour = hourToDeleteTasksValue,
                 currentMinute = minToDeleteTasksValue,
-                updateHour = updateHourToDeleteTasks,
-                updateMinute = updateMinToDeleteTasks
+                updateHour = {
+                    onAction.invoke(SettingsAction.OnUpdateHourToDeleteTasks(it))
+                },
+                updateMinute = {
+                    onAction.invoke(SettingsAction.OnUpdateMinToDeleteTasks(it))
+                }
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchRow(
@@ -109,7 +112,7 @@ fun SettingsScreen(
                     description = stringResource(R.string.setting_use_dynamic_theme_description),
                     checked = initialUseDynamicThemeValue,
                     setCheck = {
-                        updateUseDynamicTheme(it)
+                        onAction.invoke(SettingsAction.OnToggleDynamicTheme(it))
                         openDialog.value = true
                     }
                 )

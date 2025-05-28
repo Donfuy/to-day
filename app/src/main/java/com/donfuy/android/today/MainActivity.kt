@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.Lifecycle
@@ -34,6 +35,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -91,42 +94,30 @@ fun TodayNavHost(
             HomeScreen(
                 todayTasksFlow = taskViewModel.todayTasks,
                 tomorrowTasksFlow = taskViewModel.tomorrowTasks,
-                onAddTask = { task, tomorrow -> taskViewModel.newTask(task, tomorrow) },
-                onUpdateTask = taskViewModel::updateTask,
-                onBinTask = taskViewModel::binTask,
-                setCheck = taskViewModel::setCheck,
-                setToday = taskViewModel::setToday,
-                setTomorrow = taskViewModel::setTomorrow,
                 showCompletedFlow = taskViewModel.showCompleted,
-                setShowCompleted = taskViewModel::updateShowCompleted,
                 completedToBottomFlow = taskViewModel.completedToBottom,
                 onClickSettings = { navController.navigate(SETTINGS_ROUTE) },
                 onClickBin = { navController.navigate(BIN_ROUTE) },
+                onAction = taskViewModel::onHomeAction
             )
         }
         composable(SETTINGS_ROUTE) {
             SettingsScreen(
-                onClickBack = { navController.navigateUp() },
                 showCompleted = taskViewModel.showCompleted,
-                updateShowCompleted = taskViewModel::updateShowCompleted,
                 completedToBottom = taskViewModel.completedToBottom,
-                updateCompletedToBottom = taskViewModel::updateCompletedToBottom,
                 useDynamicTheme = taskViewModel.useDynamicTheme,
-                updateUseDynamicTheme = taskViewModel::updateUseDynamicTheme,
                 hourToDeleteTasks = taskViewModel.hourToDeleteTasks,
-                updateHourToDeleteTasks = taskViewModel::updateHourToDeleteTasks,
                 minToDeleteTasks = taskViewModel.minToDeleteTasks,
-                updateMinToDeleteTasks = taskViewModel::updateMinToDeleteTasks,
-                restartApp = restartApp
+                onAction = taskViewModel::onSettingsAction,
+                onBackClick = { navController.navigateUp() },
+                onRestartApp = restartApp
             )
         }
         composable(BIN_ROUTE) {
             BinScreen(
                 tasks = taskViewModel.binTasks,
-                onClickBack = { navController.navigateUp() },
-                onDeleteTask = taskViewModel::deleteTask,
-                onRestoreTask = taskViewModel::restoreTask,
-                onDeleteBinned = taskViewModel::deleteAllBinnedTasks
+                onBackClick = { navController.navigateUp() },
+                onAction = taskViewModel::onBinAction
             )
         }
     }

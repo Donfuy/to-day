@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.BinAction
+import com.donfuy.android.today.ui.HomeAction
+import com.donfuy.android.today.ui.SettingsAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -130,6 +133,36 @@ class TaskViewModel @Inject constructor(
     fun updateTask(task: Task) {
         viewModelScope.launch {
             tasksRepository.update(task = task)
+        }
+    }
+
+    fun onHomeAction(action: HomeAction) {
+        when (action) {
+            is HomeAction.OnAddTask -> newTask(action.task, action.tomorrow)
+            is HomeAction.OnBinTask -> binTask(action.task)
+            is HomeAction.OnUpdateTask -> updateTask(action.task)
+            is HomeAction.SetCheck -> setCheck(action.task, action.checked)
+            is HomeAction.SetToday -> setToday(action.task)
+            is HomeAction.SetTomorrow -> setTomorrow(action.task)
+            is HomeAction.SetShowCompleted -> updateShowCompleted(action.showCompleted)
+        }
+    }
+
+    fun onBinAction(action: BinAction) {
+        when (action) {
+            is BinAction.OnDeleteTask -> deleteTask(action.task)
+            is BinAction.OnRestoreTask -> restoreTask(action.task)
+            is BinAction.OnDeleteAllTasks -> deleteAllBinnedTasks()
+        }
+    }
+
+    fun onSettingsAction(action: SettingsAction) {
+        when (action) {
+            is SettingsAction.OnToggleShowCompleted -> updateShowCompleted(action.showCompleted)
+            is SettingsAction.OnToggleCompletedToBottom -> updateCompletedToBottom(action.completedToBottom)
+            is SettingsAction.OnToggleDynamicTheme -> updateUseDynamicTheme(action.useDynamicTheme)
+            is SettingsAction.OnUpdateHourToDeleteTasks -> updateHourToDeleteTasks(action.hourToDeleteTasks)
+            is SettingsAction.OnUpdateMinToDeleteTasks -> updateMinToDeleteTasks(action.minToDeleteTasks)
         }
     }
 }

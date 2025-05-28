@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.HomeAction
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -43,17 +44,11 @@ import kotlinx.coroutines.flow.Flow
 fun HomeScreen(
     todayTasksFlow: Flow<List<Task>>,
     tomorrowTasksFlow: Flow<List<Task>>,
-    onAddTask: (String, Boolean) -> Unit,
-    onBinTask: (Task) -> Unit,
-    onUpdateTask: (Task) -> Unit,
-    setCheck: (Task, Boolean) -> Unit,
-    setToday: (Task) -> Unit,
-    setTomorrow: (Task) -> Unit,
     showCompletedFlow: Flow<Boolean>,
-    setShowCompleted: (Boolean) -> Unit,
     completedToBottomFlow: Flow<Boolean>,
     onClickSettings: () -> Unit,
     onClickBin: () -> Unit,
+    onAction: (HomeAction) -> Unit
 ) {
     val completedToBottom = completedToBottomFlow.collectAsState(initial = false).value
     val showCompleted = showCompletedFlow.collectAsState(initial = false).value
@@ -88,14 +83,14 @@ fun HomeScreen(
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
-            HomeTopBar(
-                onClickSettings = onClickSettings, onClickBin = onClickBin
-            )
+            HomeTopBar(onClickSettings = onClickSettings, onClickBin = onClickBin)
         },
         bottomBar = {
             if (taskEntryVisible) {
                 TaskEntryBottomBar(
-                    onSubmit = { onAddTask(it, tabState == 1) },
+                    onSubmit = {
+                        onAction.invoke(HomeAction.OnAddTask(it, tabState == 1))
+                   },
                     taskEntryFocusRequester = taskEntryFocusRequester,
                     onCloseClick = {
                         focusManager.clearFocus()
@@ -138,18 +133,20 @@ fun HomeScreen(
                         tomorrowTasks
                     },
                     onItemClicked = { setCurrentEditItemId(it.id.toInt()) },
-                    setCheck = setCheck,
-                    setToday = setToday,
-                    setTomorrow = setTomorrow,
+                    setCheck = { task, checked ->
+                        onAction.invoke(HomeAction.SetCheck(task, checked))
+                    },
+                    setToday = { onAction.invoke(HomeAction.SetToday(it)) },
+                    setTomorrow = { onAction.invoke(HomeAction.SetTomorrow(it)) },
                     onUpdateTask = {
-                        onUpdateTask(it)
+                        onAction.invoke(HomeAction.OnUpdateTask(it))
                         setCurrentEditItemId(-1)
                     },
-                    onBinTask = onBinTask,
+                    onBinTask = { onAction.invoke(HomeAction.OnBinTask(it)) },
                     currentEditItemId = currentEditItemId,
                     state = homeListState,
                     showCompletedFlow = showCompletedFlow,
-                    setShowCompleted = setShowCompleted,
+                    setShowCompleted = { onAction.invoke(HomeAction.SetShowCompleted(it)) },
                     completedToBottomFlow = completedToBottomFlow
                 )
             }

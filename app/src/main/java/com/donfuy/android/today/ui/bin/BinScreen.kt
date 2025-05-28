@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.BinAction
 import com.donfuy.android.today.ui.TaskRow
 import kotlinx.coroutines.flow.Flow
 
@@ -37,10 +38,8 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun BinScreen(
     tasks: Flow<List<Task>>,
-    onClickBack: () -> Unit,
-    onDeleteTask: (Task) -> Unit,
-    onRestoreTask: (Task) -> Unit,
-    onDeleteBinned: () -> Unit
+    onBackClick: () -> Unit,
+    onAction: (BinAction) -> Unit
 ) {
     // TODO: Banner explaining what the bin is and what happens to the tasks in this list
     // TODO: Right action button should delete all tasks in the bin
@@ -52,7 +51,7 @@ fun BinScreen(
     DeleteAllAlertDialog(
         openDialog = openDialog,
         confirmOnClick = {
-            onDeleteBinned()
+            onAction(BinAction.OnDeleteAllTasks)
             openDialog.value = false
         },
         dismissOnClick = { openDialog.value = false }
@@ -64,7 +63,7 @@ fun BinScreen(
                 CenterAlignedTopAppBar(
                     title = { Text(stringResource(id = R.string.bin_screen_title)) },
                     navigationIcon = {
-                        IconButton(onClick = onClickBack) {
+                        IconButton(onClick = onBackClick) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(id = R.string.bin_back_content_description)
@@ -94,8 +93,12 @@ fun BinScreen(
         ) {
             BinList(
                 tasks = taskItems.value,
-                onDeleteTask,
-                onRestoreTask
+                onDeleteTask = {
+                    onAction(BinAction.OnDeleteTask(it))
+                },
+                onRestoreTask = {
+                    onAction(BinAction.OnRestoreTask(it))
+                }
             )
         }
     }
@@ -111,8 +114,8 @@ fun BinList(
         items(tasks, key = { it.id }) { task ->
             BinRow(
                 task = task,
-                onDeleteTask = { onDeleteTask(task) },
-                onRestoreTask = { onRestoreTask(task) }
+                onSwipeLeft = { onDeleteTask(task) },
+                onSwipeRight = { onRestoreTask(task) }
             )
             HorizontalDivider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
@@ -122,18 +125,18 @@ fun BinList(
 @Composable
 fun BinRow(
     task: Task,
-    onDeleteTask: () -> Unit,
-    onRestoreTask: () -> Unit
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit
 ) {
     TaskRow(
         task = task,
-        onSwipeLeft = onDeleteTask,
+        onSwipeLeft = onSwipeLeft,
         swipeLeftText = stringResource(id = R.string.swipe_action_delete_forever),
         swipeLeftTextColor = MaterialTheme.colorScheme.onErrorContainer,
         swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         swipeLeftIcon = Icons.Outlined.Delete,
         swipeLeftIconTint = MaterialTheme.colorScheme.onErrorContainer,
-        onSwipeRight = onRestoreTask,
+        onSwipeRight = onSwipeRight,
         swipeRightText = stringResource(id = R.string.swipe_action_restore),
         swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
         swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,

@@ -54,6 +54,12 @@ class TaskViewModel @Inject constructor(
 
     init {
         // Combine all the flows into the respective uiStates
+        updateHomeScreen()
+        updateBinScreen()
+        updateSettingsScreen()
+    }
+
+    private fun updateHomeScreen() {
         viewModelScope.launch {
             combine(
                 tasksRepository.todayTasks,
@@ -75,6 +81,37 @@ class TaskViewModel @Inject constructor(
                 )
             }.collect {
                 _homeUiState.value = it
+            }
+        }
+    }
+
+    private fun updateBinScreen() {
+        viewModelScope.launch {
+            tasksRepository.binTasks.collect {
+                _binUiState.value = BinUiState(binTasks = it)
+            }
+        }
+    }
+
+    private fun updateSettingsScreen() {
+        viewModelScope.launch {
+            combine(
+                userPreferencesRepository.showCompleted,
+                userPreferencesRepository.completedToBottom,
+                userPreferencesRepository.useDynamicTheme,
+                userPreferencesRepository.hourToDeleteTasks,
+                userPreferencesRepository.minToDeleteTasks
+
+            ) { showCompleted, completedToBottom, useDynamicTheme, hourToDeleteTasks, minToDeleteTasks ->
+                SettingsUiState(
+                    showCompleted = showCompleted,
+                    completedToBottom = completedToBottom,
+                    useDynamicTheme = useDynamicTheme,
+                    hourToDeleteTasks = hourToDeleteTasks,
+                    minToDeleteTasks = minToDeleteTasks
+                )
+            }.collect {
+                _settingsUiState.value = it
             }
         }
     }

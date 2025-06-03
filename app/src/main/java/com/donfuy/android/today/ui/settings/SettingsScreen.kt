@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,26 +31,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.ui.SettingsAction
-import kotlinx.coroutines.flow.Flow
+import com.donfuy.android.today.ui.SettingsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    showCompleted: Flow<Boolean>,
-    completedToBottom: Flow<Boolean>,
-    useDynamicTheme: Flow<Boolean>,
-    hourToDeleteTasks: Flow<Int>,
-    minToDeleteTasks: Flow<Int>,
+    uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
     onBackClick: () -> Unit,
     onRestartApp: () -> Unit
 ) {
-    val showCompletedValue = showCompleted.collectAsState(initial = false).value
-    val completedToBottomValue = completedToBottom.collectAsState(initial = true).value
-    val initialUseDynamicThemeValue = useDynamicTheme.collectAsState(initial = false).value
-    val hourToDeleteTasksValue = hourToDeleteTasks.collectAsState(initial = 2).value
-    val minToDeleteTasksValue = minToDeleteTasks.collectAsState(initial = 0).value
-
     val openDialog = remember { mutableStateOf(false) }
 
     RestartAppAlertDialog(
@@ -81,7 +70,7 @@ fun SettingsScreen(
             SwitchRow(
                 title = stringResource(id = R.string.setting_show_completed_tasks_title),
                 description = stringResource(id = R.string.setting_show_completed_tasks_description),
-                checked = showCompletedValue,
+                checked = uiState.showCompleted,
                 setCheck = {
                     onAction.invoke(SettingsAction.OnToggleShowCompleted(it))
                 }
@@ -89,7 +78,7 @@ fun SettingsScreen(
             SwitchRow(
                 title = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_title),
                 description = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_description),
-                checked = completedToBottomValue,
+                checked = uiState.completedToBottom,
                 setCheck = {
                     onAction.invoke(SettingsAction.OnToggleCompletedToBottom(it))
                 }
@@ -97,8 +86,8 @@ fun SettingsScreen(
             TimePickerRow(
                 title = stringResource(R.string.setting_move_to_bin_time_title),
                 description = stringResource(R.string.setting_move_to_bin_time_description),
-                currentHour = hourToDeleteTasksValue,
-                currentMinute = minToDeleteTasksValue,
+                currentHour = uiState.hourToDeleteTasks,
+                currentMinute = uiState.minToDeleteTasks,
                 updateHour = {
                     onAction.invoke(SettingsAction.OnUpdateHourToDeleteTasks(it))
                 },
@@ -110,7 +99,7 @@ fun SettingsScreen(
                 SwitchRow(
                     title = stringResource(R.string.setting_use_dynamic_theme_title),
                     description = stringResource(R.string.setting_use_dynamic_theme_description),
-                    checked = initialUseDynamicThemeValue,
+                    checked = uiState.useDynamicTheme,
                     setCheck = {
                         onAction.invoke(SettingsAction.OnToggleDynamicTheme(it))
                         openDialog.value = true

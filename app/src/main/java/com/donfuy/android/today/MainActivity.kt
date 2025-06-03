@@ -102,20 +102,18 @@ fun TodayNavHost(
             )
         }
         composable(SETTINGS_ROUTE) {
+            val uiState by taskViewModel.settingsUiState.collectAsStateWithLifecycle()
             SettingsScreen(
-                showCompleted = taskViewModel.showCompleted,
-                completedToBottom = taskViewModel.completedToBottom,
-                useDynamicTheme = taskViewModel.useDynamicTheme,
-                hourToDeleteTasks = taskViewModel.hourToDeleteTasks,
-                minToDeleteTasks = taskViewModel.minToDeleteTasks,
+                uiState = uiState,
                 onAction = taskViewModel::onSettingsAction,
                 onBackClick = { navController.navigateUp() },
                 onRestartApp = restartApp
             )
         }
         composable(BIN_ROUTE) {
+            val uiState by taskViewModel.binUiState.collectAsStateWithLifecycle()
             BinScreen(
-                tasks = taskViewModel.binTasks,
+                uiState = uiState,
                 onBackClick = { navController.navigateUp() },
                 onAction = taskViewModel::onBinAction
             )

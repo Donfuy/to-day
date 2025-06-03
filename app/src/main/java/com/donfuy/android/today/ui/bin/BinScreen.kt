@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,21 +30,17 @@ import androidx.compose.ui.unit.Dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.BinAction
+import com.donfuy.android.today.ui.BinUiState
 import com.donfuy.android.today.ui.TaskRow
-import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BinScreen(
-    tasks: Flow<List<Task>>,
+    uiState: BinUiState,
     onBackClick: () -> Unit,
     onAction: (BinAction) -> Unit
 ) {
     // TODO: Banner explaining what the bin is and what happens to the tasks in this list
-    // TODO: Right action button should delete all tasks in the bin
-
-    val taskItems = tasks.collectAsState(initial = listOf())
-
     val openDialog = remember { mutableStateOf(false) }
 
     DeleteAllAlertDialog(
@@ -92,7 +87,7 @@ fun BinScreen(
                 .padding(contentPadding)
         ) {
             BinList(
-                tasks = taskItems.value,
+                tasks = uiState.binTasks,
                 onDeleteTask = {
                     onAction(BinAction.OnDeleteTask(it))
                 },

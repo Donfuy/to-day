@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +50,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -63,9 +61,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun TaskList(
@@ -78,14 +76,10 @@ fun TaskList(
     onBinTask: (Task) -> Unit,
     currentEditItemId: Int,
     state: LazyListState,
-    showCompletedFlow: Flow<Boolean>,
+    showCompleted: Boolean,
     setShowCompleted: (Boolean) -> Unit,
-    completedToBottomFlow: Flow<Boolean>
+    completedToBottom: Boolean
 ) {
-
-    val showCompleted = showCompletedFlow.collectAsState(initial = false).value
-    val completedToBottom = completedToBottomFlow.collectAsState(initial = true).value
-
     LazyColumn(state = state) {
         items(tasks.filter { !it.checked }, key = { it.id }) { task ->
             when {

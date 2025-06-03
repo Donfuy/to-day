@@ -22,7 +22,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,32 +34,17 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
-import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.HomeAction
-import kotlinx.coroutines.flow.Flow
+import com.donfuy.android.today.ui.HomeUiState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreen(
-    todayTasksFlow: Flow<List<Task>>,
-    tomorrowTasksFlow: Flow<List<Task>>,
-    showCompletedFlow: Flow<Boolean>,
-    completedToBottomFlow: Flow<Boolean>,
+    uiState: HomeUiState,
     onClickSettings: () -> Unit,
     onClickBin: () -> Unit,
     onAction: (HomeAction) -> Unit
 ) {
-    val completedToBottom = completedToBottomFlow.collectAsState(initial = false).value
-    val showCompleted = showCompletedFlow.collectAsState(initial = false).value
-
-    val todayTasks = todayTasksFlow.collectAsState(initial = listOf()).value
-        .completedToBottom(completedToBottom)
-        .showCompleted(showCompleted)
-
-    val tomorrowTasks = tomorrowTasksFlow.collectAsState(initial = listOf()).value
-        .completedToBottom(completedToBottom)
-        .showCompleted(showCompleted)
-
     val homeListState = rememberLazyListState()
 
     // Id of task being edited - -1 if no task is being edited
@@ -72,8 +56,6 @@ fun HomeScreen(
         stringResource(id = R.string.today_tab_title),
         stringResource(id = R.string.tomorrow_tab_title)
     )
-    val tabVisible = remember { mutableStateOf(false) }
-    tabVisible.value = tomorrowTasks.isNotEmpty()
 
     // BottomBar + FAB
     val taskEntryFocusRequester = remember { FocusRequester() }
@@ -114,7 +96,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
-            AnimatedVisibility(visible = tabVisible.value) {
+            AnimatedVisibility(visible = uiState.tabVisible) {
                 TabRow(selectedTabIndex = tabState) {
                     tabTitles.forEachIndexed { index, title ->
                         Tab(text = { Text(title) },
@@ -127,10 +109,10 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 TaskList(
-                    tasks = if ((tabState == 0) || !tabVisible.value) {
-                        todayTasks
+                    tasks = if ((tabState == 0) || !uiState.tabVisible) {
+                        uiState.todayTasks
                     } else {
-                        tomorrowTasks
+                        uiState.tomorrowTasks
                     },
                     onItemClicked = { setCurrentEditItemId(it.id.toInt()) },
                     setCheck = { task, checked ->
@@ -145,9 +127,9 @@ fun HomeScreen(
                     onBinTask = { onAction.invoke(HomeAction.OnBinTask(it)) },
                     currentEditItemId = currentEditItemId,
                     state = homeListState,
-                    showCompletedFlow = showCompletedFlow,
+                    showCompleted = uiState.showCompleted,
                     setShowCompleted = { onAction.invoke(HomeAction.SetShowCompleted(it)) },
-                    completedToBottomFlow = completedToBottomFlow
+                    completedToBottom = uiState.completedToBottom
                 )
             }
 
@@ -167,22 +149,6 @@ fun HomeFAB(onClick: () -> Unit) {
                 modifier = Modifier.size(36.dp)
             )
         }
-}
-
-private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {
-    return if (!showCompleted) {
-        this.filter { !it.checked }
-    } else {
-        this
-    }
-}
-
-private fun List<Task>.completedToBottom(completedToBottom: Boolean): List<Task> {
-    return if (completedToBottom) {
-        this.sortedBy { it.checked }
-    } else {
-        this
-    }
 }
 
 @Suppress("unused")

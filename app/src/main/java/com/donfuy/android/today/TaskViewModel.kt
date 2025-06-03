@@ -6,10 +6,17 @@ import com.donfuy.android.today.data.TasksRepository
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.BinAction
+import com.donfuy.android.today.ui.BinUiState
 import com.donfuy.android.today.ui.HomeAction
+import com.donfuy.android.today.ui.HomeUiState
 import com.donfuy.android.today.ui.SettingsAction
+import com.donfuy.android.today.ui.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -22,6 +29,15 @@ class TaskViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+    private val _homeUiState = MutableStateFlow(HomeUiState())
+    val homeUiState: StateFlow<HomeUiState>
+        get() = _homeUiState
+
+    private val _binUiState = MutableStateFlow(BinUiState())
+    val binUiState = _binUiState.asStateFlow()
+
+    private val _settingsUiState = MutableStateFlow(SettingsUiState())
+    val settingsUiState = _settingsUiState.asStateFlow()
 
     val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompleted
     val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
@@ -33,10 +49,35 @@ class TaskViewModel @Inject constructor(
         userPreferencesRepository.daysToKeep.first()
     }
 
-    val todayTasks: Flow<List<Task>> = tasksRepository.todayTasks
-    val tomorrowTasks: Flow<List<Task>> = tasksRepository.tomorrowTasks
     val binTasks: Flow<List<Task>> = tasksRepository.binTasks
 
+
+    init {
+        // Combine all the flows into the respective uiStates
+        viewModelScope.launch {
+            combine(
+                tasksRepository.todayTasks,
+                tasksRepository.tomorrowTasks,
+                userPreferencesRepository.showCompleted,
+                userPreferencesRepository.completedToBottom
+            ) {
+                todayTasks, tomorrowTasks, showCompleted, completedToBottom ->
+                HomeUiState(
+                    todayTasks = todayTasks
+                        .showCompleted(showCompleted)
+                        .completedToBottom(completedToBottom),
+                    tomorrowTasks = tomorrowTasks
+                        .showCompleted(showCompleted)
+                        .completedToBottom(completedToBottom),
+                    showCompleted = showCompleted,
+                    completedToBottom = completedToBottom,
+                    tabVisible = tomorrowTasks.isNotEmpty()
+                )
+            }.collect {
+                _homeUiState.value = it
+            }
+        }
+    }
 
     fun newTask(task: String, tomorrow: Boolean) {
         val creationDate: Date = Calendar.getInstance().time
@@ -164,6 +205,22 @@ class TaskViewModel @Inject constructor(
             is SettingsAction.OnUpdateHourToDeleteTasks -> updateHourToDeleteTasks(action.hourToDeleteTasks)
             is SettingsAction.OnUpdateMinToDeleteTasks -> updateMinToDeleteTasks(action.minToDeleteTasks)
         }
+    }
+}
+
+private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {
+    return if (!showCompleted) {
+        this.filter { !it.checked }
+    } else {
+        this
+    }
+}
+
+private fun List<Task>.completedToBottom(completedToBottom: Boolean): List<Task> {
+    return if (completedToBottom) {
+        this.sortedBy { it.checked }
+    } else {
+        this
     }
 }
 

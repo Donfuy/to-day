@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -91,11 +93,9 @@ fun TodayNavHost(
         startDestination = HOME_ROUTE
     ) {
         composable(HOME_ROUTE) {
+            val uiState by taskViewModel.homeUiState.collectAsStateWithLifecycle()
             HomeScreen(
-                todayTasksFlow = taskViewModel.todayTasks,
-                tomorrowTasksFlow = taskViewModel.tomorrowTasks,
-                showCompletedFlow = taskViewModel.showCompleted,
-                completedToBottomFlow = taskViewModel.completedToBottom,
+                uiState = uiState,
                 onClickSettings = { navController.navigate(SETTINGS_ROUTE) },
                 onClickBin = { navController.navigate(BIN_ROUTE) },
                 onAction = taskViewModel::onHomeAction

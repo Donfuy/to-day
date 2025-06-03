@@ -109,7 +109,6 @@ fun TaskList(
                     )
                 }
             }
-//            Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
         if (completedToBottom && !tasks.none { it.checked }) {
             item {
@@ -149,7 +148,6 @@ fun TaskList(
                             )
                         }
                     }
-//                    Divider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
                 }
             }
         }
@@ -157,7 +155,6 @@ fun TaskList(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ShowCompletedButton(
     showCompleted: Boolean,

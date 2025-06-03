@@ -38,20 +38,12 @@ class TaskViewModel @Inject constructor(
 
     private val _settingsUiState = MutableStateFlow(SettingsUiState())
     val settingsUiState = _settingsUiState.asStateFlow()
-
-    val showCompleted: Flow<Boolean> = userPreferencesRepository.showCompleted
-    val completedToBottom: Flow<Boolean> = userPreferencesRepository.completedToBottom
     val useDynamicTheme: Flow<Boolean> = userPreferencesRepository.useDynamicTheme
-    val hourToDeleteTasks: Flow<Int> = userPreferencesRepository.hourToDeleteTasks
-    val minToDeleteTasks: Flow<Int> = userPreferencesRepository.minToDeleteTasks
 
     private val daysToKeepTasks = runBlocking {
         userPreferencesRepository.daysToKeep.first()
     }
-
-    val binTasks: Flow<List<Task>> = tasksRepository.binTasks
-
-
+    
     init {
         // Combine all the flows into the respective uiStates
         updateHomeScreen()

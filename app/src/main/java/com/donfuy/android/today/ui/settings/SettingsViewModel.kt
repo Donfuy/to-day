@@ -79,7 +79,6 @@ class SettingsViewModel @Inject constructor(
             is SettingsAction.OnUpdateMinToDeleteTasks -> updateMinToDeleteTasks(action.minToDeleteTasks)
         }
     }
-
 }
 
 data class SettingsUiState(

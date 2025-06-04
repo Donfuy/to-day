@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,9 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -191,7 +188,7 @@ fun TimePickerRow(
             )
         }
         Text(
-            text = "$currentHour:$currentMinute",
+            text = "${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}",
             modifier = Modifier
                 .padding(start = 16.dp, top = 8.dp)
         )
@@ -214,39 +211,6 @@ fun TimePickerRow(
 //        }
 //    }
 //}
-
-@Composable
-fun RestartAppAlertDialog(
-    openDialog: MutableState<Boolean>,
-    confirmOnClick: () -> Unit,
-    dismissOnClick: () -> Unit
-) {
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-                Text(text = stringResource(R.string.dialog_required_restart_title))
-            },
-            text = { Text(text = stringResource(R.string.dialog_required_restart_prompt)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    openDialog.value = false
-                    confirmOnClick()
-                }) {
-                    Text(stringResource(R.string.dialog_required_restart_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    openDialog.value = false
-                    dismissOnClick()
-                }) {
-                    Text(stringResource(R.string.dialog_required_restart_later))
-                }
-            }
-        )
-    }
-}
 
 @Suppress("unused")
 private const val TAG = "SettingsScreen"

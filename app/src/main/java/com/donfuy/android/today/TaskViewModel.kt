@@ -8,6 +8,7 @@ import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.BinAction
 import com.donfuy.android.today.ui.BinUiState
 import com.donfuy.android.today.ui.HomeAction
+import com.donfuy.android.today.ui.HomeTab
 import com.donfuy.android.today.ui.HomeUiState
 import com.donfuy.android.today.ui.SettingsAction
 import com.donfuy.android.today.ui.SettingsUiState
@@ -18,8 +19,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -39,10 +40,6 @@ class TaskViewModel @Inject constructor(
     private val _settingsUiState = MutableStateFlow(SettingsUiState())
     val settingsUiState = _settingsUiState.asStateFlow()
     val useDynamicTheme: Flow<Boolean> = userPreferencesRepository.useDynamicTheme
-
-    private val daysToKeepTasks = runBlocking {
-        userPreferencesRepository.daysToKeep.first()
-    }
     
     init {
         // Combine all the flows into the respective uiStates
@@ -126,10 +123,10 @@ class TaskViewModel @Inject constructor(
     }
 
     fun binTask(task: Task) {
-        val calendar = Calendar.getInstance()
-        // Calculate time 3 days from now
-        calendar.add(Calendar.DAY_OF_MONTH, daysToKeepTasks)
         viewModelScope.launch {
+            val calendar = Calendar.getInstance()
+            // Calculate time 3 days from now
+            calendar.add(Calendar.DAY_OF_MONTH, userPreferencesRepository.daysToKeep.first())
             tasksRepository.bin(task, calendar.time)
         }
 
@@ -203,6 +200,7 @@ class TaskViewModel @Inject constructor(
     fun updateTask(task: Task) {
         viewModelScope.launch {
             tasksRepository.update(task = task)
+            setCurrentEditItemId(-1)
         }
     }
 
@@ -215,7 +213,36 @@ class TaskViewModel @Inject constructor(
             is HomeAction.SetToday -> setToday(action.task)
             is HomeAction.SetTomorrow -> setTomorrow(action.task)
             is HomeAction.SetShowCompleted -> updateShowCompleted(action.showCompleted)
+            is HomeAction.OnTabClick -> onTabClick(action.tab)
+            is HomeAction.SetTaskEntryVisible -> setTaskEntryVisible(action.visible)
+            is HomeAction.OnSwipeLeft -> onSwipeLeft()
+            is HomeAction.OnSwipeRight -> onSwipeRight()
+            is HomeAction.OnTaskClick -> onTaskClick(action.task)
         }
+    }
+
+    private fun setCurrentEditItemId(id: Int) {
+        viewModelScope.launch { _homeUiState.update { it.copy(currentEditItemId = id) } }
+    }
+
+    private fun setTaskEntryVisible(taskEntryVisible: Boolean) {
+        viewModelScope.launch { _homeUiState.update { it.copy(taskEntryVisible = taskEntryVisible) } }
+    }
+
+    private fun onTabClick(tab: HomeTab) {
+        viewModelScope.launch { _homeUiState.update { it.copy(currentTab = tab) } }
+    }
+
+    private fun onSwipeLeft() {
+        TODO()
+    }
+
+    private fun onSwipeRight() {
+        TODO()
+    }
+
+    private fun onTaskClick(task: Task) {
+        setCurrentEditItemId(task.id.toInt())
     }
 
     fun onBinAction(action: BinAction) {

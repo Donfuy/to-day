@@ -22,12 +22,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -35,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.ui.HomeAction
+import com.donfuy.android.today.ui.HomeTab
 import com.donfuy.android.today.ui.HomeUiState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -47,19 +43,8 @@ fun HomeScreen(
 ) {
     val homeListState = rememberLazyListState()
 
-    // Id of task being edited - -1 if no task is being edited
-    val (currentEditItemId, setCurrentEditItemId) = rememberSaveable { mutableIntStateOf(-1) }
-
-    // Tabs
-    var tabState by remember { mutableIntStateOf(0) }
-    val tabTitles = listOf(
-        stringResource(id = R.string.today_tab_title),
-        stringResource(id = R.string.tomorrow_tab_title)
-    )
-
     // BottomBar + FAB
     val taskEntryFocusRequester = remember { FocusRequester() }
-    val (taskEntryVisible, setTaskEntryVisible) = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -68,26 +53,29 @@ fun HomeScreen(
             HomeTopBar(onClickSettings = onClickSettings, onClickBin = onClickBin)
         },
         bottomBar = {
-            if (taskEntryVisible) {
+            if (uiState.taskEntryVisible) {
                 TaskEntryBottomBar(
-                    onSubmit = {
-                        onAction.invoke(HomeAction.OnAddTask(it, tabState == 1))
+                    onSubmit = { task ->
+                        onAction(HomeAction.OnAddTask(
+                            task = task,
+                            tomorrow = uiState.currentTab == HomeTab.TOMORROW
+                        ))
                    },
                     taskEntryFocusRequester = taskEntryFocusRequester,
                     onCloseClick = {
                         focusManager.clearFocus()
-                        setTaskEntryVisible(false)
+                        onAction(HomeAction.SetTaskEntryVisible(false))
                     }
                 )
             }
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = !taskEntryVisible,
+                visible = !uiState.taskEntryVisible,
                 enter = scaleIn(),
                 exit = scaleOut()
             ) {
-                HomeFAB(onClick = { setTaskEntryVisible(true) })
+                HomeFAB(onClick = { onAction(HomeAction.SetTaskEntryVisible(true)) })
             }
         }
     ) { contentPadding ->
@@ -97,11 +85,11 @@ fun HomeScreen(
                 .padding(contentPadding)
         ) {
             AnimatedVisibility(visible = uiState.tabVisible) {
-                TabRow(selectedTabIndex = tabState) {
-                    tabTitles.forEachIndexed { index, title ->
-                        Tab(text = { Text(title) },
-                            selected = tabState == index,
-                            onClick = { tabState = index })
+                TabRow(selectedTabIndex = uiState.currentTab.ordinal) {
+                    HomeTab.entries.forEach {
+                        Tab(text = { Text(stringResource(id = it.title)) },
+                            selected = uiState.currentTab == it,
+                            onClick = { onAction(HomeAction.OnTabClick(it)) })
                     }
                 }
             }
@@ -109,27 +97,25 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 TaskList(
-                    tasks = if ((tabState == 0) || !uiState.tabVisible) {
+                    tasks = if ((uiState.currentTab == HomeTab.TODAY) || !uiState.tabVisible) {
                         uiState.todayTasks
                     } else {
                         uiState.tomorrowTasks
                     },
-                    onItemClicked = { setCurrentEditItemId(it.id.toInt()) },
+                    onItemClicked = {
+                        onAction(HomeAction.OnTaskClick(it))
+                    },
                     setCheck = { task, checked ->
-                        onAction.invoke(HomeAction.SetCheck(task, checked))
+                        onAction(HomeAction.SetCheck(task, checked))
                     },
-                    setToday = { onAction.invoke(HomeAction.SetToday(it)) },
-                    setTomorrow = { onAction.invoke(HomeAction.SetTomorrow(it)) },
+                    setToday = { onAction(HomeAction.SetToday(it)) },
+                    setTomorrow = { onAction(HomeAction.SetTomorrow(it)) },
                     onUpdateTask = {
-                        onAction.invoke(HomeAction.OnUpdateTask(it))
-                        setCurrentEditItemId(-1)
+                        onAction(HomeAction.OnUpdateTask(it))
                     },
-                    onBinTask = { onAction.invoke(HomeAction.OnBinTask(it)) },
-                    currentEditItemId = currentEditItemId,
-                    state = homeListState,
-                    showCompleted = uiState.showCompleted,
-                    setShowCompleted = { onAction.invoke(HomeAction.SetShowCompleted(it)) },
-                    completedToBottom = uiState.completedToBottom
+                    onBinTask = { onAction(HomeAction.OnBinTask(it)) },
+                    currentEditItemId = uiState.currentEditItemId,
+                    state = homeListState
                 )
             }
 

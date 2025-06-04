@@ -76,12 +76,9 @@ fun TaskList(
     onBinTask: (Task) -> Unit,
     currentEditItemId: Int,
     state: LazyListState,
-    showCompleted: Boolean,
-    setShowCompleted: (Boolean) -> Unit,
-    completedToBottom: Boolean
 ) {
     LazyColumn(state = state) {
-        items(tasks.filter { !it.checked }, key = { it.id }) { task ->
+        items(tasks, key = { it.id }) { task ->
             when {
                 task.id.toInt() == currentEditItemId -> {
                     TaskEditRow(
@@ -110,48 +107,6 @@ fun TaskList(
                 }
             }
         }
-        if (completedToBottom && !tasks.none { it.checked }) {
-            item {
-                ShowCompletedButton(
-                    showCompleted = showCompleted,
-                    setShowCompleted = setShowCompleted
-                )
-            }
-            // TODO: AnimatedVisibility
-
-            if (showCompleted) {
-                items(tasks.filter { it.checked }, key = { it.id }) { task ->
-                    when {
-                        task.id.toInt() == currentEditItemId -> {
-                            TaskEditRow(
-                                onSubmitEdit = onUpdateTask,
-                                onEmptySubmit = { onBinTask(task) },
-                                task = task,
-                            )
-                        }
-                        !task.tomorrow -> {
-                            TodayTaskRow(
-                                task = task,
-                                setCheck = { setCheck(task, it) },
-                                onSwipeLeft = { onBinTask(task) },
-                                onSwipeRight = { setTomorrow(task) },
-                                onItemClicked = { onItemClicked(task) }
-                            )
-                        }
-                        else -> {
-                            TomorrowTaskRow(
-                                task = task,
-                                setCheck = { setCheck(task, it) },
-                                onItemClicked = { onItemClicked(task) },
-                                onSwipeLeft = { onBinTask(task) },
-                                onSwipeRight = { setToday(task)  }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
     }
 }
 

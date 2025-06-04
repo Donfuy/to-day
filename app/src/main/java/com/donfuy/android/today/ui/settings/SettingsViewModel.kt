@@ -40,6 +40,46 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateCompletedToBottom(completedToBottom: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateCompletedToBottom(completedToBottom)
+        }
+    }
+
+    fun updateUseDynamicTheme(useDynamicTheme: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateUseDynamicTheme(useDynamicTheme)
+        }
+    }
+
+    fun updateHourToDeleteTasks(hourToDeleteTasks: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateHourToDeleteTasks(hourToDeleteTasks)
+        }
+    }
+
+    fun updateMinToDeleteTasks(minToDeleteTasks: Int) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateMinToDeleteTasks(minToDeleteTasks)
+        }
+    }
+
+    fun updateShowCompleted(showCompleted: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateShowCompleted(showCompleted)
+        }
+    }
+
+    fun onSettingsAction(action: SettingsAction) {
+        when (action) {
+            is SettingsAction.OnToggleShowCompleted -> updateShowCompleted(action.showCompleted)
+            is SettingsAction.OnToggleCompletedToBottom -> updateCompletedToBottom(action.completedToBottom)
+            is SettingsAction.OnToggleDynamicTheme -> updateUseDynamicTheme(action.useDynamicTheme)
+            is SettingsAction.OnUpdateHourToDeleteTasks -> updateHourToDeleteTasks(action.hourToDeleteTasks)
+            is SettingsAction.OnUpdateMinToDeleteTasks -> updateMinToDeleteTasks(action.minToDeleteTasks)
+        }
+    }
+
 }
 
 data class SettingsUiState(

@@ -13,7 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,16 +21,14 @@ import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
 import com.donfuy.android.today.ui.bin.BinViewModel
 import com.donfuy.android.today.ui.home.HomeScreen
-import com.donfuy.android.today.ui.home.TaskViewModel
+import com.donfuy.android.today.ui.home.HomeViewModel
 import com.donfuy.android.today.ui.settings.SettingsScreen
 import com.donfuy.android.today.ui.settings.SettingsViewModel
 import com.donfuy.android.today.ui.theme.TodayTheme
-import com.donfuy.android.today.workers.scheduleBinCleanup
 import com.donfuy.android.today.workers.scheduleTodayCleanup
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,18 +43,19 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                userPreferencesRepository.hourToDeleteTasks.collect { hourToCleanup ->
-                    userPreferencesRepository.minToDeleteTasks.collect { minuteToCleanup ->
-                        scheduleTodayCleanup(applicationContext, hourToCleanup, minuteToCleanup)
-                    }
+                combine(
+                    userPreferencesRepository.hourToDeleteTasks,
+                    userPreferencesRepository.minToDeleteTasks
+                ) { hour, min ->
+                    Pair(hour, min)
+                }.collect {
+                    scheduleTodayCleanup(applicationContext, it.first, it.second)
                 }
             }
         }
 
-        scheduleBinCleanup(applicationContext)
-
         setContent {
-            TodayApp { restartApp() }
+            TodayApp(userPreferencesRepository)
         }
     }
 
@@ -65,65 +63,59 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(applicationContext, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        finish()
     }
 }
 
-
-
 @Composable
-fun TodayApp(restartApp: () -> Unit) {
-    val taskViewModel: TaskViewModel = viewModel()
+fun TodayApp(
+    userPreferencesRepository: UserPreferencesRepository
+) {
+    val useDynamicTheme by userPreferencesRepository.useDynamicTheme.collectAsStateWithLifecycle(initialValue = false)
 
-    TodayTheme(useDynamicColorScheme = runBlocking { taskViewModel.useDynamicTheme.first() }) {
+    TodayTheme(useDynamicColorScheme = useDynamicTheme) {
         val navController = rememberNavController()
         Surface {
-            TodayNavHost(
-                navController = navController,
-                taskViewModel = taskViewModel,
-                restartApp = restartApp
-            )
+            TodayNavHost(navController = navController)
         }
     }
 }
 
 @Composable
 fun TodayNavHost(
-    navController: NavHostController,
-    taskViewModel: TaskViewModel,
-    restartApp: () -> Unit
+    navController: NavHostController
 ) {
+    val homeViewModel = hiltViewModel<HomeViewModel>()
+    val settingsViewModel = hiltViewModel<SettingsViewModel>()
+    val binViewModel = hiltViewModel<BinViewModel>()
+
     NavHost(
         navController = navController,
         startDestination = HOME_ROUTE
     ) {
         composable(HOME_ROUTE) {
-            val homeViewModel = hiltViewModel<TaskViewModel>()
             val uiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
-
             HomeScreen(
                 uiState = uiState,
                 onClickSettings = { navController.navigate(SETTINGS_ROUTE) },
                 onClickBin = { navController.navigate(BIN_ROUTE) },
-                onAction = taskViewModel::onHomeAction
+                onAction = homeViewModel::onHomeAction
             )
         }
         composable(SETTINGS_ROUTE) {
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
             val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
             SettingsScreen(
                 uiState = uiState,
-                onAction = taskViewModel::onSettingsAction,
-                onBackClick = { navController.navigateUp() },
-                onRestartApp = restartApp
+                onAction = settingsViewModel::onSettingsAction,
+                onBackClick = { navController.navigateUp() }
             )
         }
         composable(BIN_ROUTE) {
-            val binViewModel = hiltViewModel<BinViewModel>()
             val uiState by binViewModel.uiState.collectAsStateWithLifecycle()
             BinScreen(
                 uiState = uiState,
                 onBackClick = { navController.navigateUp() },
-                onAction = taskViewModel::onBinAction
+                onAction = binViewModel::onBinAction
             )
         }
     }

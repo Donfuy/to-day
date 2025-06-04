@@ -10,7 +10,6 @@ sealed interface HomeAction {
     data class SetCheck(val task: Task, val checked: Boolean) : HomeAction
     data class SetToday(val task: Task) : HomeAction
     data class SetTomorrow(val task: Task) : HomeAction
-    data class SetShowCompleted(val showCompleted: Boolean) : HomeAction
     data class OnTabClick(val tab: HomeTab) : HomeAction
     data class SetTaskEntryVisible(val visible: Boolean) : HomeAction
     data class OnTaskClick(val task: Task) : HomeAction

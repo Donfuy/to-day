@@ -28,6 +28,35 @@ class BinViewModel @Inject constructor(
         }
     }
 
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            tasksRepository.delete(task = task)
+        }
+    }
+
+    fun deleteAllBinnedTasks() {
+        viewModelScope.launch {
+            tasksRepository.deleteAllBinnedTasks()
+        }
+    }
+
+    fun restoreTask(task: Task) {
+        viewModelScope.launch {
+            tasksRepository.update(task = task.copy(
+                binned = false,
+                deleteBy = null,
+                checked = false
+            ))
+        }
+    }
+
+    fun onBinAction(action: BinAction) {
+        when (action) {
+            is BinAction.OnDeleteTask -> deleteTask(action.task)
+            is BinAction.OnRestoreTask -> restoreTask(action.task)
+            is BinAction.OnDeleteAllTasks -> deleteAllBinnedTasks()
+        }
+    }
 
 }
 

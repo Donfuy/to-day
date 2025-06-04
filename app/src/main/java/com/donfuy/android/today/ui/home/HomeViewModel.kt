@@ -7,10 +7,7 @@ import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.model.Task
 import com.donfuy.android.today.ui.HomeTab
 import com.donfuy.android.today.ui.HomeUiState
-import com.donfuy.android.today.ui.bin.BinAction
-import com.donfuy.android.today.ui.settings.SettingsAction
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,15 +19,13 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class TaskViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val _homeUiState = MutableStateFlow(HomeUiState())
     val homeUiState: StateFlow<HomeUiState>
         get() = _homeUiState
-
-    val useDynamicTheme: Flow<Boolean> = userPreferencesRepository.useDynamicTheme
     
     init {
         updateHomeScreen()
@@ -97,21 +92,6 @@ class TaskViewModel @Inject constructor(
 
     }
 
-    fun deleteAllBinnedTasks() {
-        viewModelScope.launch {
-            tasksRepository.deleteAllBinnedTasks()
-        }
-    }
-
-    fun restoreTask(task: Task) {
-        updateTask(task = task.copy(
-            binned = false,
-            deleteBy = null,
-            tomorrow = false,
-            checked = false
-        ))
-    }
-
     fun setTomorrow(task: Task) {
         updateTask(task = task.copy(tomorrow = true))
     }
@@ -120,45 +100,9 @@ class TaskViewModel @Inject constructor(
         updateTask(task = task.copy(tomorrow = false))
     }
 
-    fun updateShowCompleted(showCompleted: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateShowCompleted(showCompleted)
-        }
-    }
-
-    fun updateCompletedToBottom(completedToBottom: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateCompletedToBottom(completedToBottom)
-        }
-    }
-
-    fun updateUseDynamicTheme(useDynamicTheme: Boolean) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateUseDynamicTheme(useDynamicTheme)
-        }
-    }
-
-    fun updateHourToDeleteTasks(hourToDeleteTasks: Int) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateHourToDeleteTasks(hourToDeleteTasks)
-        }
-    }
-
-    fun updateMinToDeleteTasks(minToDeleteTasks: Int) {
-        viewModelScope.launch {
-            userPreferencesRepository.updateMinToDeleteTasks(minToDeleteTasks)
-        }
-    }
-
     fun addTask(task: Task) {
         viewModelScope.launch {
             tasksRepository.insert(task)
-        }
-    }
-
-    fun deleteTask(task: Task) {
-        viewModelScope.launch {
-            tasksRepository.delete(task = task)
         }
     }
 
@@ -177,7 +121,6 @@ class TaskViewModel @Inject constructor(
             is HomeAction.SetCheck -> setCheck(action.task, action.checked)
             is HomeAction.SetToday -> setToday(action.task)
             is HomeAction.SetTomorrow -> setTomorrow(action.task)
-            is HomeAction.SetShowCompleted -> updateShowCompleted(action.showCompleted)
             is HomeAction.OnTabClick -> onTabClick(action.tab)
             is HomeAction.SetTaskEntryVisible -> setTaskEntryVisible(action.visible)
             is HomeAction.OnSwipeLeft -> onSwipeLeft()
@@ -210,23 +153,9 @@ class TaskViewModel @Inject constructor(
         setCurrentEditItemId(task.id.toInt())
     }
 
-    fun onBinAction(action: BinAction) {
-        when (action) {
-            is BinAction.OnDeleteTask -> deleteTask(action.task)
-            is BinAction.OnRestoreTask -> restoreTask(action.task)
-            is BinAction.OnDeleteAllTasks -> deleteAllBinnedTasks()
-        }
-    }
 
-    fun onSettingsAction(action: SettingsAction) {
-        when (action) {
-            is SettingsAction.OnToggleShowCompleted -> updateShowCompleted(action.showCompleted)
-            is SettingsAction.OnToggleCompletedToBottom -> updateCompletedToBottom(action.completedToBottom)
-            is SettingsAction.OnToggleDynamicTheme -> updateUseDynamicTheme(action.useDynamicTheme)
-            is SettingsAction.OnUpdateHourToDeleteTasks -> updateHourToDeleteTasks(action.hourToDeleteTasks)
-            is SettingsAction.OnUpdateMinToDeleteTasks -> updateMinToDeleteTasks(action.minToDeleteTasks)
-        }
-    }
+
+
 }
 
 private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {

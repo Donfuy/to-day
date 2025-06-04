@@ -22,8 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,17 +34,8 @@ import com.donfuy.android.today.R
 fun SettingsScreen(
     uiState: SettingsUiState,
     onAction: (SettingsAction) -> Unit,
-    onBackClick: () -> Unit,
-    onRestartApp: () -> Unit
+    onBackClick: () -> Unit
 ) {
-    val openDialog = remember { mutableStateOf(false) }
-
-    RestartAppAlertDialog(
-        openDialog = openDialog,
-        confirmOnClick = onRestartApp,
-        dismissOnClick = { openDialog.value = false }
-    )
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -100,7 +89,6 @@ fun SettingsScreen(
                     checked = uiState.useDynamicTheme,
                     setCheck = {
                         onAction.invoke(SettingsAction.OnToggleDynamicTheme(it))
-                        openDialog.value = true
                     }
                 )
             }

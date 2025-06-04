@@ -30,8 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
-import com.donfuy.android.today.ui.SettingsAction
-import com.donfuy.android.today.ui.SettingsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

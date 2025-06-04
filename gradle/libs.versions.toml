@@ -36,6 +36,7 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltWork" }
+hilt-compose-nav = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltWork" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 junit = { module = "junit:junit", version.ref = "junit" }
 junit-ext = { module = "androidx.test.ext:junit", version.ref = "junitExt" }

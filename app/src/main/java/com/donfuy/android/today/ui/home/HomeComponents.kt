@@ -1,7 +1,6 @@
 package com.donfuy.android.today.ui.home
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.AutoDelete
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -44,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -64,6 +64,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.TaskRow
 
 @Composable
 fun TaskList(
@@ -178,7 +179,6 @@ fun HomeTopBar(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TaskEntryBottomBar(
     onSubmit: (String) -> Unit,
@@ -259,7 +259,6 @@ fun TaskEntryBottomBar(
     SideEffect { taskEntryFocusRequester.requestFocus() }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TaskEditRow(
     task: Task, onSubmitEdit: (Task) -> Unit, onEmptySubmit: () -> Unit
@@ -350,6 +349,60 @@ fun TaskEditRow(
             LaunchedEffect(Unit) { focusRequester.requestFocus() }
         }
     }
+}
+
+@Composable
+fun TodayTaskRow(
+    task: Task,
+    setCheck: (Boolean) -> Unit,
+    onItemClicked: () -> Unit,
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit
+) {
+    TaskRow(
+        task = task,
+        setCheck = setCheck,
+        onItemClicked = onItemClicked,
+        onSwipeLeft = onSwipeLeft,
+        swipeLeftText = stringResource(id = R.string.swipe_action_delete),
+        swipeLeftTextColor = MaterialTheme.colorScheme.error,
+        swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
+        swipeLeftIcon = Icons.Outlined.Delete,
+        swipeLeftIconTint = MaterialTheme.colorScheme.error,
+        onSwipeRight = onSwipeRight,
+        swipeRightText = stringResource(id = R.string.swipe_action_tomorrow),
+        swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        swipeRightIcon = Icons.Outlined.DateRange,
+        swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer
+    )
+}
+
+@Composable
+fun TomorrowTaskRow(
+    task: Task,
+    setCheck: (Boolean) -> Unit,
+    onItemClicked: () -> Unit,
+    onSwipeLeft: () -> Unit,
+    onSwipeRight: () -> Unit
+) {
+    TaskRow(
+        task = task,
+        setCheck = setCheck,
+        onItemClicked = onItemClicked,
+        onSwipeLeft = onSwipeLeft,
+        swipeLeftText = stringResource(id = R.string.swipe_action_delete),
+        swipeLeftTextColor = MaterialTheme.colorScheme.error,
+        swipeLeftBackgroundColor = MaterialTheme.colorScheme.errorContainer,
+        swipeLeftIcon = Icons.Outlined.Delete,
+        swipeLeftIconTint = MaterialTheme.colorScheme.error,
+        onSwipeRight = onSwipeRight,
+        swipeRightText = stringResource(id = R.string.swipe_action_today),
+        swipeRightTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        swipeRightBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        swipeRightIcon = Icons.Outlined.DateRange,
+        swipeRightIconTint = MaterialTheme.colorScheme.onPrimaryContainer
+    )
 }
 
 @Suppress("unused")

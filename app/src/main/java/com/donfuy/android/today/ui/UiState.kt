@@ -20,15 +20,3 @@ enum class HomeTab(@StringRes val title: Int) {
     TODAY(title = R.string.today_tab_title),
     TOMORROW(title = R.string.tomorrow_tab_title)
 }
-
-data class BinUiState(
-    val binTasks: List<Task> = listOf()
-)
-
-data class SettingsUiState(
-    val showCompleted: Boolean = true,
-    val completedToBottom: Boolean = true,
-    val useDynamicTheme: Boolean = false,
-    val hourToDeleteTasks: Int = 3,
-    val minToDeleteTasks: Int = 0
-)

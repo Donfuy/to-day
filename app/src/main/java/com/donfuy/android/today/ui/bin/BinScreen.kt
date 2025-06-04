@@ -29,8 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
-import com.donfuy.android.today.ui.BinAction
-import com.donfuy.android.today.ui.BinUiState
 import com.donfuy.android.today.ui.TaskRow
 
 @OptIn(ExperimentalMaterial3Api::class)

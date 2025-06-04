@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,8 +20,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.donfuy.android.today.data.UserPreferencesRepository
 import com.donfuy.android.today.ui.bin.BinScreen
+import com.donfuy.android.today.ui.bin.BinViewModel
 import com.donfuy.android.today.ui.home.HomeScreen
+import com.donfuy.android.today.ui.home.TaskViewModel
 import com.donfuy.android.today.ui.settings.SettingsScreen
+import com.donfuy.android.today.ui.settings.SettingsViewModel
 import com.donfuy.android.today.ui.theme.TodayTheme
 import com.donfuy.android.today.workers.scheduleBinCleanup
 import com.donfuy.android.today.workers.scheduleTodayCleanup
@@ -93,7 +97,9 @@ fun TodayNavHost(
         startDestination = HOME_ROUTE
     ) {
         composable(HOME_ROUTE) {
-            val uiState by taskViewModel.homeUiState.collectAsStateWithLifecycle()
+            val homeViewModel = hiltViewModel<TaskViewModel>()
+            val uiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
+
             HomeScreen(
                 uiState = uiState,
                 onClickSettings = { navController.navigate(SETTINGS_ROUTE) },
@@ -102,7 +108,8 @@ fun TodayNavHost(
             )
         }
         composable(SETTINGS_ROUTE) {
-            val uiState by taskViewModel.settingsUiState.collectAsStateWithLifecycle()
+            val settingsViewModel = hiltViewModel<SettingsViewModel>()
+            val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
             SettingsScreen(
                 uiState = uiState,
                 onAction = taskViewModel::onSettingsAction,
@@ -111,7 +118,8 @@ fun TodayNavHost(
             )
         }
         composable(BIN_ROUTE) {
-            val uiState by taskViewModel.binUiState.collectAsStateWithLifecycle()
+            val binViewModel = hiltViewModel<BinViewModel>()
+            val uiState by binViewModel.uiState.collectAsStateWithLifecycle()
             BinScreen(
                 uiState = uiState,
                 onBackClick = { navController.navigateUp() },

@@ -56,7 +56,6 @@ fun SettingsScreen(
         Column(modifier = Modifier.padding(contentPadding)) {
             SwitchRow(
                 title = stringResource(id = R.string.setting_show_completed_tasks_title),
-                description = stringResource(id = R.string.setting_show_completed_tasks_description),
                 checked = uiState.showCompleted,
                 setCheck = {
                     onAction.invoke(SettingsAction.OnToggleShowCompleted(it))
@@ -64,7 +63,6 @@ fun SettingsScreen(
             )
             SwitchRow(
                 title = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_title),
-                description = stringResource(id = R.string.setting_move_completed_tasks_to_bottom_description),
                 checked = uiState.completedToBottom,
                 setCheck = {
                     onAction.invoke(SettingsAction.OnToggleCompletedToBottom(it))
@@ -85,7 +83,6 @@ fun SettingsScreen(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SwitchRow(
                     title = stringResource(R.string.setting_use_dynamic_theme_title),
-                    description = stringResource(R.string.setting_use_dynamic_theme_description),
                     checked = uiState.useDynamicTheme,
                     setCheck = {
                         onAction.invoke(SettingsAction.OnToggleDynamicTheme(it))
@@ -100,7 +97,7 @@ fun SettingsScreen(
 @Composable
 fun SwitchRow(
     title: String,
-    description: String,
+    description: String? = null,
     checked: Boolean,
     setCheck: (Boolean) -> Unit
 ) {
@@ -120,12 +117,14 @@ fun SwitchRow(
                 softWrap = true,
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.labelMedium,
-                softWrap = true,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-            )
+            description?.let {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.labelMedium,
+                    softWrap = true,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                )
+            }
         }
         Switch(
             checked = checked,

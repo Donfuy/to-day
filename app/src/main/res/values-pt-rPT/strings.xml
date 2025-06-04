@@ -14,9 +14,15 @@
     <string name="swipe_action_today">Hoje</string>
     <string name="swipe_action_tomorrow">Amanhã</string>
     <string name="setting_show_completed_tasks_title">Mostrar tarefas concluídas</string>
-    <string name="setting_show_completed_tasks_description">TODO description</string>
     <string name="setting_move_completed_tasks_to_bottom_title">Mover tarefas concluídas para o fundo da lista</string>
-    <string name="setting_move_completed_tasks_to_bottom_description">TODO description</string>
     <string name="settings_back_content_description">Voltar às tarefas</string>
     <string name="bin_back_content_description">Voltar às tarefas</string>
+    <string name="setting_use_dynamic_theme_title">Usar tema dinâmico</string>
+    <string name="bin_right_action_delete_content_description">Eliminar permanentemente estas tarefas</string>
+    <string name="dialog_delete_all_binned_title">Esvaziar o lixo</string>
+    <string name="dialog_delete_all_binned_description">Tem a certeza que quer eliminar permanentemente todas as tarefas do lixo? Serão perdidas para sempre!</string>
+    <string name="dialog_delete_all_binned_confirm_deletion">Eliminar</string>
+    <string name="dialog_delete_all_binned_cancel">Cancelar</string>
+    <string name="setting_move_to_bin_time_title">Hora para apagar as tarefas</string>
+    <string name="setting_move_to_bin_time_description">As tarefas vão ser mandadas para o lixo a esta hora do dia</string>
 </resources>

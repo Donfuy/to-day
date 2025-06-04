@@ -123,8 +123,13 @@ class HomeViewModel @Inject constructor(
             is HomeAction.SetTomorrow -> setTomorrow(action.task)
             is HomeAction.OnTabClick -> onTabClick(action.tab)
             is HomeAction.SetTaskEntryVisible -> setTaskEntryVisible(action.visible)
-            is HomeAction.OnSwipeLeft -> onSwipeLeft()
-            is HomeAction.OnSwipeRight -> onSwipeRight()
+            is HomeAction.OnSwipeLeft -> binTask(action.task)
+            is HomeAction.OnSwipeRight -> {
+                when {
+                    !action.task.tomorrow -> setToday(action.task)
+                    action.task.tomorrow -> setTomorrow(action.task)
+                }
+            }
             is HomeAction.OnTaskClick -> onTaskClick(action.task)
         }
     }
@@ -141,21 +146,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { _homeUiState.update { it.copy(currentTab = tab) } }
     }
 
-    private fun onSwipeLeft() {
-        TODO()
-    }
-
-    private fun onSwipeRight() {
-        TODO()
-    }
-
     private fun onTaskClick(task: Task) {
         setCurrentEditItemId(task.id.toInt())
     }
-
-
-
-
 }
 
 private fun List<Task>.showCompleted(showCompleted: Boolean): List<Task> {

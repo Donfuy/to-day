@@ -71,10 +71,10 @@ fun TaskList(
     tasks: List<Task>,
     onItemClicked: (Task) -> Unit,
     setCheck: (Task, Boolean) -> Unit,
-    setToday: (Task) -> Unit,
-    setTomorrow: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
     onBinTask: (Task) -> Unit,
+    onSwipeLeft: (Task) -> Unit,
+    onSwipeRight: (Task) -> Unit,
     currentEditItemId: Int,
     state: LazyListState,
 ) {
@@ -92,8 +92,8 @@ fun TaskList(
                     TodayTaskRow(
                         task = task,
                         setCheck = { setCheck(task, it) },
-                        onSwipeLeft = { onBinTask(task) },
-                        onSwipeRight = { setTomorrow(task) },
+                        onSwipeLeft = { onSwipeLeft(task) },
+                        onSwipeRight = { onSwipeRight(task) },
                         onItemClicked = { onItemClicked(task) }
                     )
                 }
@@ -102,8 +102,8 @@ fun TaskList(
                         task = task,
                         setCheck = { setCheck(task, it) },
                         onItemClicked = { onItemClicked(task) },
-                        onSwipeLeft = { onBinTask(task) },
-                        onSwipeRight = { setToday(task) }
+                        onSwipeLeft = { onSwipeLeft(task) },
+                        onSwipeRight = { onSwipeRight(task) }
                     )
                 }
             }

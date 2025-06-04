@@ -104,14 +104,14 @@ fun HomeScreen(
                     setCheck = { task, checked ->
                         onAction(HomeAction.SetCheck(task, checked))
                     },
-                    setToday = { onAction(HomeAction.SetToday(it)) },
-                    setTomorrow = { onAction(HomeAction.SetTomorrow(it)) },
                     onUpdateTask = {
                         onAction(HomeAction.OnUpdateTask(it))
                     },
                     onBinTask = { onAction(HomeAction.OnBinTask(it)) },
                     currentEditItemId = uiState.currentEditItemId,
-                    state = homeListState
+                    state = homeListState,
+                    onSwipeLeft = { onAction(HomeAction.OnSwipeLeft(it)) },
+                    onSwipeRight = { onAction(HomeAction.OnSwipeRight(it)) }
                 )
             }
 

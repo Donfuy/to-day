@@ -110,7 +110,6 @@ fun BinList(
                 onSwipeLeft = { onDeleteTask(task) },
                 onSwipeRight = { onRestoreTask(task) }
             )
-            HorizontalDivider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.outline)
         }
     }
 }

@@ -23,9 +23,10 @@ import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -34,6 +35,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,6 +61,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -64,6 +69,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.donfuy.android.today.R
 import com.donfuy.android.today.model.Task
+import com.donfuy.android.today.ui.HomeTab
 import com.donfuy.android.today.ui.TaskRow
 
 @Composable
@@ -88,6 +94,7 @@ fun TaskList(
                         task = task,
                     )
                 }
+
                 !task.tomorrow -> {
                     TodayTaskRow(
                         task = task,
@@ -97,6 +104,7 @@ fun TaskList(
                         onItemClicked = { onItemClicked(task) }
                     )
                 }
+
                 else -> {
                     TomorrowTaskRow(
                         task = task,
@@ -153,13 +161,16 @@ fun ShowCompletedButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    onClickSettings: () -> Unit, onClickBin: () -> Unit
+    onClickSettings: () -> Unit,
+    onClickBin: () -> Unit,
+    onAction: (HomeAction) -> Unit,
+    tomorrowVisible: Boolean,
+    currentTab: HomeTab = HomeTab.TODAY
 ) {
     Column {
-        CenterAlignedTopAppBar(
-            title = {
-                Text(stringResource(id = R.string.home_screen_title))
-            }, actions = {
+        TopAppBar(
+            title = { HomeTopBarTitleConnectedButtons(tomorrowVisible, currentTab, onAction) },
+            actions = {
                 IconButton(onClick = { onClickSettings() }) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
@@ -173,9 +184,87 @@ fun HomeTopBar(
                         contentDescription = stringResource(id = R.string.bin_button_content_description)
                     )
                 }
-            }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+            }, colors = TopAppBarDefaults.topAppBarColors()
         )
-        HorizontalDivider(thickness = Dp.Hairline, color = MaterialTheme.colorScheme.secondary)
+    }
+}
+
+@Preview
+@Composable
+fun HomeTopBarPreview() {
+    Column {
+        HomeTopBar(
+            onClickSettings = {},
+            onClickBin = {},
+            onAction = {},
+            tomorrowVisible = false
+        )
+        HomeTopBar(
+            onClickSettings = {},
+            onClickBin = {},
+            onAction = {},
+            tomorrowVisible = true
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun HomeTopBarTitleConnectedButtons(
+    tomorrowActive: Boolean = false,
+    currentTab: HomeTab = HomeTab.TODAY,
+    onAction: (HomeAction.OnTabClick) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AnimatedContent(
+            targetState = tomorrowActive,
+            label = "today to tomorrow"
+        ) { tomorrowActive ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+            ) {
+                ToggleButton(
+                    checked = if (!tomorrowActive) true else currentTab == HomeTab.TODAY,
+                    enabled = tomorrowActive,
+                    onCheckedChange = { onAction(HomeAction.OnTabClick(HomeTab.TODAY)) },
+                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                    colors =
+                        if (!tomorrowActive) {
+                            ToggleButtonDefaults.toggleButtonColors().copy(
+                                containerColor = MaterialTheme.colorScheme.background,
+                                contentColor = MaterialTheme.colorScheme.onBackground,
+                                disabledContainerColor = MaterialTheme.colorScheme.background,
+                                disabledContentColor = MaterialTheme.colorScheme.onBackground,
+                                checkedContainerColor = MaterialTheme.colorScheme.background,
+                                checkedContentColor = MaterialTheme.colorScheme.onBackground
+                            )
+                        } else {
+                            ToggleButtonDefaults.toggleButtonColors()
+                        }
+                ) {
+                    Text(
+                        style = if (!tomorrowActive) {
+                            MaterialTheme.typography.titleLargeEmphasized
+                        } else {
+                            MaterialTheme.typography.labelLarge
+                        },
+                        text = stringResource(if (!tomorrowActive) R.string.app_name else HomeTab.TODAY.title)
+                    )
+                }
+                if (tomorrowActive) {
+                    ToggleButton(
+                        checked = currentTab == HomeTab.TOMORROW,
+                        onCheckedChange = { onAction(HomeAction.OnTabClick(HomeTab.TOMORROW))},
+                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    ) {
+                        Text(text = stringResource(HomeTab.TOMORROW.title))
+                    }
+                }
+            }
+        }
     }
 }
 

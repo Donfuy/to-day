@@ -57,12 +57,16 @@ class HomeViewModel @Inject constructor(
                         .completedToBottom(completedToBottom),
                     showCompleted = showCompleted,
                     completedToBottom = completedToBottom,
-                    tabVisible = tomorrowTasks.isNotEmpty()
+                    tabVisible = tomorrowTasks.isNotEmpty(),
                 )
             }.collect { updatedState ->
                 _homeUiState.update { currentState ->
                     updatedState.copy(
-                        currentTab = currentState.currentTab
+                        currentTab = if (updatedState.tomorrowTasks.isNotEmpty()) {
+                            currentState.currentTab
+                        } else {
+                            HomeTab.TODAY
+                        }
                     )
                 }
             }

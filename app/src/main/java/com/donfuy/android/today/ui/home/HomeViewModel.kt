@@ -130,8 +130,8 @@ class HomeViewModel @Inject constructor(
             is HomeAction.OnSwipeLeft -> binTask(action.task)
             is HomeAction.OnSwipeRight -> {
                 when {
-                    !action.task.tomorrow -> setToday(action.task)
-                    action.task.tomorrow -> setTomorrow(action.task)
+                    !action.task.tomorrow -> setTomorrow(action.task)
+                    action.task.tomorrow -> setToday(action.task)
                 }
             }
             is HomeAction.OnTaskClick -> onTaskClick(action.task)

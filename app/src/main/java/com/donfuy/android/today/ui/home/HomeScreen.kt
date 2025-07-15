@@ -19,10 +19,7 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.donfuy.android.today.R
@@ -39,9 +36,6 @@ fun HomeScreen(
 ) {
     val homeListState = rememberLazyListState()
 
-    val taskEntryFocusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -53,30 +47,14 @@ fun HomeScreen(
                 onAction = onAction
             )
         },
-        bottomBar = {
-            if (uiState.taskEntryVisible) {
-                TaskEntryBottomBar(
-                    onSubmit = { task ->
-                        onAction(HomeAction.OnAddTask(
-                            task = task,
-                            tomorrow = uiState.currentTab == HomeTab.TOMORROW
-                        ))
-                   },
-                    taskEntryFocusRequester = taskEntryFocusRequester,
-                    onCloseClick = {
-                        focusManager.clearFocus()
-                        onAction(HomeAction.SetTaskEntryVisible(false))
-                    }
-                )
-            }
-        },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = !uiState.taskEntryVisible,
+                // Show FAB if not in edit mode (no item is currently being edited)
+                visible = uiState.currentEditItemId == -1,
                 enter = scaleIn(),
                 exit = scaleOut()
             ) {
-                HomeFAB(onClick = { onAction(HomeAction.SetTaskEntryVisible(true)) })
+                HomeFAB(onClick = { onAction(HomeAction.OnAddTask) })
             }
         }
     ) { contentPadding ->
@@ -100,8 +78,8 @@ fun HomeScreen(
                     setCheck = { task, checked ->
                         onAction(HomeAction.SetCheck(task, checked))
                     },
-                    onUpdateTask = {
-                        onAction(HomeAction.OnUpdateTask(it))
+                    onSubmitTask = {
+                        onAction(HomeAction.OnSubmitTask(it))
                     },
                     onBinTask = { onAction(HomeAction.OnBinTask(it)) },
                     currentEditItemId = uiState.currentEditItemId,

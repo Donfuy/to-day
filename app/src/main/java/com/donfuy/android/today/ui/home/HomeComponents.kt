@@ -1,6 +1,7 @@
 package com.donfuy.android.today.ui.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -77,7 +78,7 @@ fun TaskList(
     tasks: List<Task>,
     onItemClicked: (Task) -> Unit,
     setCheck: (Task, Boolean) -> Unit,
-    onUpdateTask: (Task) -> Unit,
+    onSubmitTask: (Task) -> Unit,
     onBinTask: (Task) -> Unit,
     onSwipeLeft: (Task) -> Unit,
     onSwipeRight: (Task) -> Unit,
@@ -89,7 +90,7 @@ fun TaskList(
             when {
                 task.id.toInt() == currentEditItemId -> {
                     TaskEditRow(
-                        onSubmitEdit = onUpdateTask,
+                        onSubmitEdit = onSubmitTask,
                         onEmptySubmit = { onBinTask(task) },
                         task = task,
                     )
@@ -348,11 +349,11 @@ fun TaskEntryBottomBar(
     SideEffect { taskEntryFocusRequester.requestFocus() }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TaskEditRow(
     task: Task, onSubmitEdit: (Task) -> Unit, onEmptySubmit: () -> Unit
 ) {
-    // Workaround for the workaround not being able to be rememberSaveable
     val (text, setText) = rememberSaveable { mutableStateOf(task.task) }
 
     // Workaround to set the cursor at the end of the BasicTextField
@@ -365,7 +366,7 @@ fun TaskEditRow(
     }
     val (checked, setChecked) = remember { mutableStateOf(task.checked) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     // Access lifecycle events to ensure unsubmitted text doesn't get lost.

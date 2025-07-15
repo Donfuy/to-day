@@ -12,7 +12,6 @@ data class HomeUiState(
     val completedToBottom: Boolean = true,
     val tabVisible: Boolean = tomorrowTasks.isNotEmpty(),
     val currentTab: HomeTab = HomeTab.TODAY,
-    val taskEntryVisible: Boolean = false,
     val currentEditItemId: Int = -1
 )
 

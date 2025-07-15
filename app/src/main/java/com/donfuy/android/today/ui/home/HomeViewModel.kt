@@ -18,6 +18,14 @@ import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
+// Helper data class for updateHomeScreen
+private data class HomeScreenFlowInputs(
+    val todayTasks: List<Task>,
+    val tomorrowTasks: List<Task>,
+    val showCompleted: Boolean,
+    val completedToBottom: Boolean
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val tasksRepository: TasksRepository,
@@ -31,14 +39,6 @@ class HomeViewModel @Inject constructor(
         updateHomeScreen()
     }
 
-    /**
-     * Updates the home screen UI state by observing task and preference changes.
-     *
-     * Combines flows for today's tasks, tomorrow's tasks, and user preferences
-     * (show completed, move completed to bottom) to create and emit a `HomeUiState`.
-     * Task lists are filtered/sorted based on preferences.
-     * The tomorrow tab visibility is determined by the presence of tomorrow's tasks.
-     */
     private fun updateHomeScreen() {
         viewModelScope.launch {
             combine(
@@ -46,42 +46,40 @@ class HomeViewModel @Inject constructor(
                 tasksRepository.tomorrowTasks,
                 userPreferencesRepository.showCompleted,
                 userPreferencesRepository.completedToBottom
-            ) {
-                todayTasks, tomorrowTasks, showCompleted, completedToBottom ->
-                HomeUiState(
-                    todayTasks = todayTasks
-                        .showCompleted(showCompleted)
-                        .completedToBottom(completedToBottom),
-                    tomorrowTasks = tomorrowTasks
-                        .showCompleted(showCompleted)
-                        .completedToBottom(completedToBottom),
-                    showCompleted = showCompleted,
-                    completedToBottom = completedToBottom,
-                    tabVisible = tomorrowTasks.isNotEmpty(),
-                )
-            }.collect { updatedState ->
+            ) { today, tomorrow, show, completedBottom ->
+                HomeScreenFlowInputs(today, tomorrow, show, completedBottom)
+            }.collect { inputs -> 
                 _homeUiState.update { currentState ->
-                    updatedState.copy(
-                        currentTab = if (updatedState.tomorrowTasks.isNotEmpty()) {
-                            currentState.currentTab
-                        } else {
-                            HomeTab.TODAY
-                        }
+                    val newTodayTasks = inputs.todayTasks
+                        .showCompleted(inputs.showCompleted)
+                        .completedToBottom(inputs.completedToBottom)
+                    val newTomorrowTasks = inputs.tomorrowTasks
+                        .showCompleted(inputs.showCompleted)
+                        .completedToBottom(inputs.completedToBottom)
+                    val newTabVisible = newTomorrowTasks.isNotEmpty()
+
+                    currentState.copy(
+                        todayTasks = newTodayTasks,
+                        tomorrowTasks = newTomorrowTasks,
+                        showCompleted = inputs.showCompleted,
+                        completedToBottom = inputs.completedToBottom,
+                        tabVisible = newTabVisible,
+                        currentTab = if (newTabVisible) currentState.currentTab else HomeTab.TODAY
                     )
                 }
             }
         }
     }
 
-    fun newTask(task: String, tomorrow: Boolean) {
+    fun newTask() {
         val creationDate: Date = Calendar.getInstance().time
         addTask(
             Task(
-                task = task,
+                task = "",
                 createdAt = creationDate,
                 lastModifiedAt = null,
                 deleteBy = null,
-                tomorrow = tomorrow
+                tomorrow = _homeUiState.value.currentTab == HomeTab.TOMORROW
             )
         )
     }
@@ -93,11 +91,10 @@ class HomeViewModel @Inject constructor(
     fun binTask(task: Task) {
         viewModelScope.launch {
             val calendar = Calendar.getInstance()
-            // Calculate time 3 days from now
             calendar.add(Calendar.DAY_OF_MONTH, userPreferencesRepository.daysToKeep.first())
             tasksRepository.bin(task, calendar.time)
+            setCurrentEditItemId(-1)
         }
-
     }
 
     fun setTomorrow(task: Task) {
@@ -110,27 +107,31 @@ class HomeViewModel @Inject constructor(
 
     fun addTask(task: Task) {
         viewModelScope.launch {
-            tasksRepository.insert(task)
+            val id = tasksRepository.insert(task)
+            setCurrentEditItemId(id.toInt())
         }
     }
 
     fun updateTask(task: Task) {
         viewModelScope.launch {
             tasksRepository.update(task = task)
-            setCurrentEditItemId(-1)
         }
+    }
+
+    private fun onSubmitTask(task: Task) {
+        updateTask(task)
+        newTask()
     }
 
     fun onHomeAction(action: HomeAction) {
         when (action) {
-            is HomeAction.OnAddTask -> newTask(action.task, action.tomorrow)
-            is HomeAction.OnBinTask -> binTask(action.task)
-            is HomeAction.OnUpdateTask -> updateTask(action.task)
+            is HomeAction.OnAddTask -> newTask()
+            is HomeAction.OnBinTask -> binTask(action.task) 
+            is HomeAction.OnSubmitTask -> onSubmitTask(action.task)
             is HomeAction.SetCheck -> setCheck(action.task, action.checked)
             is HomeAction.SetToday -> setToday(action.task)
             is HomeAction.SetTomorrow -> setTomorrow(action.task)
             is HomeAction.OnTabClick -> onTabClick(action.tab)
-            is HomeAction.SetTaskEntryVisible -> setTaskEntryVisible(action.visible)
             is HomeAction.OnSwipeLeft -> binTask(action.task)
             is HomeAction.OnSwipeRight -> {
                 when {
@@ -146,12 +147,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { _homeUiState.update { it.copy(currentEditItemId = id) } }
     }
 
-    private fun setTaskEntryVisible(taskEntryVisible: Boolean) {
-        viewModelScope.launch { _homeUiState.update { it.copy(taskEntryVisible = taskEntryVisible) } }
-    }
-
     private fun onTabClick(tab: HomeTab) {
-        viewModelScope.launch { _homeUiState.update { it.copy(currentTab = tab) } }
+        viewModelScope.launch { _homeUiState.update { it.copy(currentTab = tab, currentEditItemId = -1) } }
     }
 
     private fun onTaskClick(task: Task) {
